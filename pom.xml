@@ -10,19 +10,21 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.tensorflow</groupId>
-            <artifactId>libtensorflow</artifactId>
-            <version>1.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.tensorflow</groupId>
-            <artifactId>libtensorflow_jni</artifactId>
-            <version>1.8.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j.deeplearning4j-core</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j.nd4j-native-platform</groupId>
+            <artifactId>nd4j-native-platform</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j.datavec-api</groupId>
+            <artifactId>datavec-api</artifactId>
         </dependency>
     </dependencies>
     
