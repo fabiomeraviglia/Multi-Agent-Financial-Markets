@@ -7,6 +7,7 @@ import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
@@ -14,12 +15,21 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Sgd;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 public class Main
 {
-  public static void main(String[] args) throws Exception
+  public static void main(String[] args)
   {
-    List<String> rows = Files.readAllLines(Paths.get("res/AAPL_BID_RES_1M_RANGE_1Y.csv"));
+    List<String> rows;
+    try
+    {
+      rows = Files.readAllLines(Paths.get("res/AAPL_BID_RES_1M_RANGE_1Y.csv"));
+    } catch (Exception e)
+    {
+      System.out.println("Error reading file");
+      return;
+    }
     List<Integer> close_prices = new ArrayList<>();
     for (String r : rows.subList(1, rows.size()))
     {
@@ -30,10 +40,15 @@ public class Main
     {
       price_variations.add((float) (close_prices.get(i) - close_prices.get(i - 1)));
     }
+
     List<Float[]> price_samples = new ArrayList<>();
     for (int i = 0; i < price_variations.size() - 65; i++)
     {
-      price_samples.add((Float[]) price_variations.subList(i, i + 65).toArray());
+      price_samples.add(new Float[65]);
+      for (int j = 0; j < 65; j++)
+      {
+        price_samples.get(i)[j] = price_variations.get(i + j);
+      }
     }
 
     int cursor = 0;
@@ -56,13 +71,11 @@ public class Main
       feature_data[i] = feature_data_vector;
       label_data[i] = label_data_vector;
     }
+
     INDArray features = Nd4j.create(feature_data);
     INDArray labels = Nd4j.create(label_data);
 
-    DummyDataSetIterator dataSetIterator = new DummyDataSetIterator(
-      price_samples, 100, (int)((float)price_samples.size() * 0.66));*/
-
-    int num_epochs = 15;
+    int num_epochs = 10;
 
     MultiLayerConfiguration nn_conf = new NeuralNetConfiguration.Builder()
       .weightInit(WeightInit.XAVIER)
@@ -74,7 +87,7 @@ public class Main
         .nOut(34)
         .activation(Activation.SIGMOID)
         .build())
-      .layer(1, new DenseLayer.Builder()
+      .layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.MSE)
         .nIn(34)
         .nOut(5) // predict next five price variations
         .activation(Activation.SOFTMAX)
