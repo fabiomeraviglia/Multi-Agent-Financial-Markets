@@ -2,6 +2,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.Math;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -22,6 +23,13 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 public class Main
 {
+  private static List<Float> KStandardDeviations = new ArrayList<Float>() {{
+    add(-12.00f); add(- 6.00f); add(- 3.00f); add(- 2.00f); add(- 1.00f);
+    add(- 0.80f); add(- 0.60f); add(- 0.40f); add(- 0.20f); add(- 0.10f);
+    add(- 0.05f); add(  0.05f); add(  0.10f); add(  0.20f); add(  0.40f);
+    add(  0.60f); add(  0.80f); add(  1.00f); add(  2.00f); add(  3.00f);
+    add(  6.00f); add( 12.00f); }};
+
   private static List<String> readAPPLData()
   {
     List<String> rows;
@@ -36,160 +44,164 @@ public class Main
     return rows;
   }
 
-  private static List<Integer> extract_close_prices_from_csv_rows(
-    List<String> csv_rows,
+  private static List<Integer> getClosePrices(
+    List<String> csvRows,
     int position,
     boolean header)
   {
-    List<Integer> close_prices = new ArrayList<>();
-    csv_rows = header ? csv_rows.subList(1, csv_rows.size()) : csv_rows;
-    for (String r : csv_rows)
+    List<Integer> closePrices = new ArrayList<>();
+    csvRows = header ? csvRows.subList(1, csvRows.size()) : csvRows;
+    for (String r : csvRows)
     {
-      close_prices.add((int) (Float.parseFloat(r.split(",")[position]) * 1000));
+      closePrices.add((int) (Float.parseFloat(r.split(",")[position]) * 1000));
     }
 
-    return  close_prices;
+    return  closePrices;
   }
 
-  private static List<Float> convert_to_price_variations(List<Integer> close_prices)
+  private static List<Float> convertToPriceVariations(
+    List<Integer> closePrices)
   {
-    List<Float> price_variations = new ArrayList<>();
-    for (int i = 1; i < close_prices.size(); i++)
+    List<Float> priceVariations = new ArrayList<>();
+    for (int i = 1; i < closePrices.size(); i++)
     {
-      price_variations.add((float) (close_prices.get(i) - close_prices.get(i - 1)));
+      priceVariations.add((float) (closePrices.get(i) - closePrices.get(i - 1)));
     }
 
-    return price_variations;
+    return priceVariations;
   }
 
-  private static INDArray[] prepare_price_variations_features_labels(
-    List<Float> price_variations,
-    float training_percentage,
-    int price_variation_in_input,
-    int price_variation_in_output
+  private static float stdDev(
+    float[] dataVector)
+  {
+    float sum = 0.0f;
+    for (int i = 0; i < dataVector.length; i++)
+      sum += dataVector[i];
+    float avg = sum/dataVector.length;
+
+    float error2sum = 0.0f;
+    for (int i = 0; i < dataVector.length; i++)
+      error2sum += (float)Math.pow(dataVector[i] - avg, 2);
+
+    return (float)Math.sqrt(error2sum/(dataVector.length - 1));
+  }
+
+  private static float[] classifyInStdDevIncrements(
+    float priceVariation,
+    float seriesStdDev)
+  {
+    float[] ret = new float[KStandardDeviations.size()+1];
+    for (int i = 0; i < ret.length; i++)
+    {
+      ret[i] = 0.0f;
+    }
+    if (priceVariation/seriesStdDev < KStandardDeviations.get(0))
+    {
+      ret[0] = 1.0f;
+      return ret;
+    }
+    if (priceVariation/seriesStdDev > KStandardDeviations.get(KStandardDeviations.size()-1))
+    {
+      ret[KStandardDeviations.size()] = 1.0f;
+      return ret;
+    }
+    for (int i=1; i < KStandardDeviations.size(); i++)
+    {
+      if(   priceVariation/seriesStdDev > KStandardDeviations.get(i-1)
+        && priceVariation/seriesStdDev < KStandardDeviations.get(i))
+      {
+        ret[i] = 1.0f;
+        return ret;
+      }
+    }
+    return ret;
+  }
+
+  private static INDArray[] prepareFeaturesAndLables(
+    List<Float> priceVariations,
+    float trainingPercentage,
+    int featuresSize
   )
   {
-    int price_block_size = price_variation_in_input + price_variation_in_output;
-    List<Float[]> price_samples = new ArrayList<>();
-    for (int i = 0; i < price_variations.size() - price_block_size; i++)
+    float[] data = new float[priceVariations.size()];
+    for (int i = 0; i < data.length; i++) data[i] = priceVariations.get(i);
+
+    int trainingSize = (int)((data.length - featuresSize) * trainingPercentage);
+    int testingSize = data.length - featuresSize - trainingSize;
+    float[][] featuresDataTraining = new float[trainingSize][0];
+    float[][] labelsDataTraining = new float[trainingSize][0];
+    float[][] featuresDataTesting = new float[testingSize][0];
+    float[][] labelsDataTesting = new float[testingSize][0];
+
+    for (int i = 0; i < trainingSize + testingSize; i++)
     {
-      price_samples.add(new Float[price_block_size]);
-      for (int j = 0; j < price_block_size; j++)
+      float[] featuresVector = new float[featuresSize];
+      for (int j = 0; j < featuresSize; j++) featuresVector[j] = data[i + j];
+
+      float[] labelVector = classifyInStdDevIncrements(
+        data[i + featuresSize],
+        stdDev(featuresVector));
+
+      if(i < trainingSize)
       {
-        //price_samples.get(i)[j] = price_variations.get(i + j);
-        price_samples.get(i)[j] = 500.0f;
+        featuresDataTraining[i] = featuresVector;
+        labelsDataTraining[i] = labelVector;
+      }
+      else
+      {
+        featuresDataTesting[i - trainingSize] = featuresVector;
+        labelsDataTesting[i - trainingSize] = labelVector;
       }
     }
 
-    //int training_samples_num = (int) (price_samples.size() * training_percentage);
-    float[][] feature_data = new float[price_samples.size()][0];
-    float[][] label_data = new float[price_samples.size()][0];
-    for (int i = 0; i < price_samples.size(); i++)
-    {
-      float[] feature_data_vector = new float[price_samples.get(i).length - price_variation_in_output];
-      float[] label_data_vector = new float[price_variation_in_output];
+    INDArray trf = Nd4j.create(featuresDataTraining);
+    INDArray trl = Nd4j.create(labelsDataTraining);
+    INDArray tsf = Nd4j.create(featuresDataTesting);
+    INDArray tsl = Nd4j.create(labelsDataTesting);
+    return new INDArray[]{trf, trl, tsf, tsl};
 
-      for (int j = 0; j < feature_data_vector.length; j++)
-      {
-        feature_data_vector[j] = price_samples.get(i)[j];
-      }
-      for (int j = 0; j < label_data_vector.length; j++)
-      {
-        label_data_vector[j] = price_samples.get(i)[feature_data_vector.length + j];
-      }
-      feature_data[i] = feature_data_vector;
-      label_data[i] = label_data_vector;
-    }
-
-    int training_samples = (int) (feature_data.length * training_percentage);
-    float[][] training_feature_data = new float[training_samples][0];
-    float[][] training_label_data = new float[training_samples][0];
-    float[][] testing_feature_data = new float[feature_data.length - training_samples][0];
-    float[][] testing_label_data = new float[feature_data.length - training_samples][0];
-    for (int i = 0; i < training_samples; i++)
-    {
-      training_feature_data[i] = feature_data[i];
-      training_label_data[i] = label_data[i];
-    }
-    for (int i = 0; i < feature_data.length - training_samples; i++)
-    {
-      testing_feature_data[i] = feature_data[i+training_samples];
-      testing_label_data[i] = label_data[i+training_samples];
-    }
-
-    INDArray training_features = Nd4j.create(training_feature_data);
-    INDArray training_labels = Nd4j.create(training_label_data);
-    INDArray testing_features = Nd4j.create(testing_feature_data);
-    INDArray testing_labels = Nd4j.create(testing_label_data);
-
-    return new INDArray[]{
-      training_features,
-      training_labels,
-      testing_features,
-      testing_labels};
   }
 
   public static void main(String[] args)
   {
-    float TRAINING_PERCENTAGE = 0.66f;
-    int NUM_EPOCHS = 40;
+    float TRAINING_PERCENTAGE = 0.001f;
+    int NUM_EPOCHS = 100000;
+    int FEATURE_SIZE = 6;
 
-    List<String> appl_csv_rows = readAPPLData();
+    List<String> APPLCsvRows = readAPPLData();
 
-    List<Integer> close_prices = extract_close_prices_from_csv_rows(
-      appl_csv_rows,
-      4, true);
+    List<Integer> closePrices = getClosePrices(APPLCsvRows, 4, true);
 
-    List<Float> price_variations = convert_to_price_variations(close_prices);
+    List<Float> priceVariations = convertToPriceVariations(closePrices);
 
-    INDArray[] features_and_labels = prepare_price_variations_features_labels(
-      price_variations, 0.66f, 100, 5);
+    INDArray[] features_and_labels = prepareFeaturesAndLables(
+      priceVariations, TRAINING_PERCENTAGE, FEATURE_SIZE);
 
     INDArray training_features = features_and_labels[0];
     INDArray training_labels = features_and_labels[1];
     INDArray testing_features = features_and_labels[2];
     INDArray testing_labels = features_and_labels[3];
 
-
-    /*MultiLayerConfiguration nn_conf = new NeuralNetConfiguration.Builder()
-      .weightInit(WeightInit.XAVIER)
-      .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-      .updater(new Sgd(0.05))
-      .list()
-      .layer(0, new DenseLayer.Builder()
-        .nIn(60) // last 60 price variations
-        .nOut(120)
-        .activation(Activation.SIGMOID)
-        .build())
-
-      .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.MSE)
-        .nIn(34)
-        .nOut(5) // predict next five price variations
-        .activation(Activation.IDENTITY)
-        .build())
-      .pretrain(false)
-      .backprop(true)
-      .build();*/
-
     MultiLayerConfiguration nn_conf = new NeuralNetConfiguration.Builder()
       .weightInit(WeightInit.XAVIER)
       .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
       .updater(new Sgd(0.05))
       .list()
-      .layer(0, new GravesLSTM.Builder()
-        .nIn(100)
-        .nOut(120)
-        .activation(Activation.TANH)
+      .layer(0, new DenseLayer.Builder()
+        .nIn(FEATURE_SIZE)
+        .nOut((FEATURE_SIZE + KStandardDeviations.size() + 1)/2)
+        .activation(Activation.SIGMOID)
         .build())
-      .layer(1, new GravesLSTM.Builder()
-        .nIn(120)
-        .nOut(30)
-        .activation(Activation.TANH)
-        .build())
-      .layer(2, new RnnOutputLayer.Builder(LossFunctions.LossFunction.MSE)
-        .nIn(30)
-        .nOut(5) // predict next five price variations
-        .activation(Activation.IDENTITY)
+      /*.layer(1, new GravesLSTM.Builder()
+        .nIn((FEATURE_SIZE + KStandardDeviations.size() + 1)/2)
+        .nOut((int)((KStandardDeviations.size() + 1)*1.5))
+        .activation(Activation.SIGMOID)
+        .build())*/
+      .layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
+        //.nIn((int)((KStandardDeviations.size() + 1)*1.5))
+        .nIn((FEATURE_SIZE + KStandardDeviations.size() + 1)/2)
+        .nOut(KStandardDeviations.size() + 1)
+        .activation(Activation.SOFTMAX)
         .build())
       .pretrain(false)
       .backprop(true)
@@ -204,7 +216,6 @@ public class Main
       model.fit(training_features, training_labels);
     }
 
-    // modello, traingin + testing features -> predizione su tutti i traingin e testing -> array di predizioni, ovvero list<int>[5]
     INDArray training_output = model.output(training_features);
     INDArray testing_output = model.output(testing_features);
 
