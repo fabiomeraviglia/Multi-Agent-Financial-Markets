@@ -21,6 +21,7 @@ public class Simulation {
     }
     public void nextTurn()
     {
+        //shuffle agents ? ordine di esecuzione deve essere casuale
         for(Agent agent : agents)
         {
             Action action = agent.getAction(marketHistory);
@@ -36,7 +37,6 @@ public class Simulation {
         OfferAsk ask = orderBooks.getAsk();
         if(ask!=null)
             marketHistory.addAsk(ask.getPrice());
-        ask.price=2;
 
         OfferBid bid = orderBooks.getBid();
         if(bid!=null)

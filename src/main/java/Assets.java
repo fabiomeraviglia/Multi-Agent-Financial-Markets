@@ -32,7 +32,7 @@ public class Assets {
 
     public static Assets defaultAssets()
     {
-        int DEFAULT_STOCKS=0;
+        int DEFAULT_STOCKS=10;
         int DEFAULT_CASH=1000;
         return new Assets(DEFAULT_CASH, DEFAULT_STOCKS);
     }

@@ -165,7 +165,7 @@ public static void main(String[] args) {
   Simulation sim = new  Simulation(10);
   sim.initialize();
 
-  sim.nextTurn();
+  for(int i = 0;i<20;i++) sim.nextTurn();
   sim.nextTurn();
   sim.nextTurn();
 
