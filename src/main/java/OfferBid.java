@@ -11,13 +11,9 @@ public class OfferBid extends Offer{
     @Override
     public void accept(Agent buyer, Integer quantity) {
 
-        stockQuantity-=quantity;
-        buyer.getAssets().addStocks(quantity);
-        owner.getAssets().addStocks(-quantity);
+        super.accept(buyer,owner,quantity);
 
-        Integer cost = price*quantity;
-        owner.getAssets().addCash(cost);
-        buyer.getAssets().addCash(-cost);
+        owner.getOfferedAssets().addStocks(-quantity);
 
     }
 

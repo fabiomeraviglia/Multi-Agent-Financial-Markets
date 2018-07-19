@@ -1,3 +1,5 @@
+import java.util.List;
+
 /**
  *
  */
@@ -12,7 +14,7 @@ public abstract class Tactic {
      * @return azione che verrà intrapresa dall'agente
      */
 
-    public abstract  Action decide(Integer predictedPrice, Assets assets);
+    public abstract List<Action> decide(Integer predictedPrice, Agent agent);
 
     public static Tactic defaultTactic(){
         return new RandomTactic();

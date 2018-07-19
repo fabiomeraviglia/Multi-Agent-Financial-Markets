@@ -8,9 +8,15 @@ public abstract class Offer {
 
     public abstract void accept(Agent client, Integer quantity);
 
-    public void accept(Agent client)
+    public void accept(Agent buyer, Agent seller, Integer quantity)
     {
-        accept(client,stockQuantity);
+        Integer cost = quantity*price;
+        buyer.getAssets().addCash(-cost);
+        seller.getAssets().addCash(cost);
+
+        buyer.getAssets().addStocks(quantity);
+        seller.getAssets().addStocks(-quantity);
+        stockQuantity-=quantity;
     }
     public void setOwner(Agent owner)
     {
@@ -38,11 +44,16 @@ public abstract class Offer {
     public Integer getPrice() {
         return price;
     }
-
+    public Integer getCost()
+    {
+        return price*stockQuantity;
+    }
     public Agent getOwner() {
         return owner;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "Offer: stockQnt"+stockQuantity+" price"+price+" OWner "+owner.toString();
+    }
 }

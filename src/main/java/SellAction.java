@@ -8,13 +8,16 @@ public class SellAction extends Action {
     }
     @Override
     public void executeAction(OrderBooks orderBooks) {
-         orderBooks.addBid(offer);
+        if(owner==null) throw new RuntimeException("Owner not set");
+        orderBooks.addBid(offer);
 
+        owner.getOfferedAssets().addStocks(offer.getStockQuantity());
     }
 
     @Override
     public void setOwner(Agent owner) {
         offer.setOwner(owner);
         super.setOwner(owner);
+
     }
 }

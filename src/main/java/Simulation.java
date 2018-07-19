@@ -24,8 +24,11 @@ public class Simulation {
         //shuffle agents ? ordine di esecuzione deve essere casuale
         for(Agent agent : agents)
         {
-            Action action = agent.getAction(marketHistory);
-            action.executeAction(orderBooks);
+            System.out.println("Richiedo azioni ad agente "+agent.toString());
+            List<Action> actions = agent.getActions(marketHistory);
+            System.out.println("Eseguo azioni");
+            for(Action action: actions) action.executeAction(orderBooks);
+            System.out.println("Terminate azioni per questo agente");
         }
 
         addHistory();

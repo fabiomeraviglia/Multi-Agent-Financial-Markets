@@ -3,6 +3,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.lang.Math;
+import java.util.Random;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -23,6 +24,7 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 public class Main
 {
+  public static Random r = new Random(69);
 private static List<Float> KStandardDeviations = new ArrayList<Float>() {{
   add(-12.00f); add(- 6.00f); add(- 3.00f); add(- 2.00f); add(- 1.00f);
   add(- 0.80f); add(- 0.60f); add(- 0.40f); add(- 0.20f); add(- 0.10f);
@@ -164,8 +166,9 @@ private static INDArray[] prepareFeaturesAndLables(
 public static void main(String[] args) {
   Simulation sim = new  Simulation(10);
   sim.initialize();
-
-  for(int i = 0;i<20;i++) sim.nextTurn();
+  System.out.println("Inizio simulazione");
+  for(int i = 0;i<20;i++)
+    sim.nextTurn();
   sim.nextTurn();
   sim.nextTurn();
 

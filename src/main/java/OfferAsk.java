@@ -11,15 +11,13 @@ public class OfferAsk extends Offer {
     @Override
     public void accept(Agent seller, Integer quantity) {
 
-        stockQuantity-=quantity;
-        owner.getAssets().addStocks(quantity);
-        seller.getAssets().addStocks(-quantity);
+        super.accept(owner,seller,quantity);
 
-        Integer cost = price*quantity;
-        seller.getAssets().addCash(cost);
-        seller.getAssets().addStocks(-quantity);
-        //decidere se i soldi di chi acquista vengono tolti nel momento in cui fa l'offerta o nel momento in cui viene accettata
+
+        owner.getOfferedAssets().addCash(-quantity*price);
+
     }
+
 
     public static class AskComparator implements Comparator<Offer> {
         @Override

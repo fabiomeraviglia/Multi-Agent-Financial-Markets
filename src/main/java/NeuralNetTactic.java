@@ -1,7 +1,10 @@
+import java.util.List;
+
 public class NeuralNetTactic extends  Tactic {
 
+
     @Override
-    public Action decide(Integer predictedPrice, Assets assets) {
+    public List<Action> decide(Integer predictedPrice, Agent agent) {
         return null;
     }
 }

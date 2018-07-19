@@ -1,4 +1,4 @@
-
+import java.util.List;
 
 public class Agent {
 
@@ -6,7 +6,7 @@ public class Agent {
     private Tactic tactic;
     private IntelligenceParameters parameter;
     private Assets assets;
-
+    private Assets offeredAssets;
 
 
     private Agent(Agent.Builder builder) {
@@ -14,15 +14,17 @@ public class Agent {
         this.tactic = builder.tactic;
         this.parameter = builder.parameter;
         this.assets = builder.assets;
+        offeredAssets= new Assets(0,0);
     }
 
 
-    public Action getAction(MarketHistory marketHistory)
+    public List<Action> getActions(MarketHistory marketHistory)
     {
             Integer predictedPrice= predictor.getPrediction(marketHistory.bid);//dare input al predittore
-            Action action = tactic.decide(predictedPrice, assets);
-            action.setOwner(this);
-            return action;
+
+            List<Action> actions = tactic.decide(predictedPrice, this);
+            for(Action action : actions) action.setOwner(this);
+            return actions;
     }
 
 
@@ -40,6 +42,18 @@ public class Agent {
 
     public Assets getAssets() {
         return assets;
+    }
+    public Assets getOfferedAssets() {
+        return offeredAssets;
+    } //si possono trovare nomi migliori
+    public Assets getFreeAssets(){
+        return new Assets(
+                assets.getCash()-offeredAssets.getCash(),
+                assets.getStocks()-offeredAssets.getStocks());
+    }
+    @Override
+    public String toString() {
+        return super.toString()+"assets:" +assets.toString()+"offered assets "+offeredAssets.toString();
     }
 
     public static class Builder  {
@@ -70,5 +84,7 @@ public class Agent {
 
            public Builder() {
         }
+
+
     }
 }
