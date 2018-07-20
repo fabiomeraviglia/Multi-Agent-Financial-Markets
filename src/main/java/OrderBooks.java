@@ -13,11 +13,11 @@ public class OrderBooks {
 
     public OrderBooks()
     {
-        buyOrders=new PriorityQueue<OfferAsk>(new OfferAsk.AskComparator());
-        sellOrders=new PriorityQueue<OfferBid>(new OfferBid.BidComparator());
+        buyOrders=new PriorityQueue<>(new OfferAsk.AskComparator());
+        sellOrders=new PriorityQueue<>(new OfferBid.BidComparator());
 
     }
-    public void addAsk(OfferAsk offer)
+    void addAsk(OfferAsk offer)
     {
         OfferBid bestBid = sellOrders.peek();
         while(bestBid!=null&&bestBid.getPrice()<=offer.getPrice()&&offer.getStockQuantity()>0)
@@ -36,7 +36,7 @@ public class OrderBooks {
 
     }
 
-    public void addBid(OfferBid offer)
+    void addBid(OfferBid offer)
     {
         OfferAsk bestAsk=buyOrders.peek();
         while (bestAsk!=null&&bestAsk.getPrice()>=offer.getPrice()&&offer.getStockQuantity()>0)

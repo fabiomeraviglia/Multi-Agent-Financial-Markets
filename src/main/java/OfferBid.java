@@ -25,7 +25,7 @@ public class OfferBid extends Offer{
     public static class BidComparator implements Comparator<Offer> {
         @Override
         public int compare(Offer x, Offer y) {
-            return y.price-x.price;
+            return x.price-y.price;
         }
     }
 

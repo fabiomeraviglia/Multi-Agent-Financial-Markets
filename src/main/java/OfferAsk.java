@@ -27,7 +27,7 @@ public class OfferAsk extends Offer {
     public static class AskComparator implements Comparator<Offer> {
         @Override
         public int compare(Offer x, Offer y) {
-            return x.price-y.price;
+            return y.price-x.price;
         }
     }
 }
