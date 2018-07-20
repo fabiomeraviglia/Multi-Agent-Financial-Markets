@@ -2,12 +2,12 @@ import java.util.Comparator;
 
 public abstract class Offer {
 
-    protected Integer stockQuantity;
-    protected Integer price;
-    protected Agent owner;
+     Integer stockQuantity;
+     Integer price;
+     Agent owner;
 
     public abstract void accept(Agent client, Integer quantity);
-
+    public abstract void cancel();
     public void accept(Agent buyer, Agent seller, Integer quantity)
     {
         Integer cost = quantity*price;

@@ -32,7 +32,11 @@ public class Simulation {
         }
 
         addHistory();
+        if(turn%200==0) {
+            marketHistory.plotAskPrices();
 
+            marketHistory.plotBidPrices();
+        }
         turn++;
     }
     private void addHistory()

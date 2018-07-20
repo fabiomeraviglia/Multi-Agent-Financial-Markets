@@ -19,12 +19,39 @@ public class OrderBooks {
     }
     public void addAsk(OfferAsk offer)
     {
+        OfferBid bestBid = sellOrders.peek();
+        while(bestBid!=null&&bestBid.getPrice()<=offer.getPrice()&&offer.getStockQuantity()>0)
+        {
+            Integer quantityBought= Math.min(bestBid.getStockQuantity(),offer.getStockQuantity());
+
+            buyOrder(offer.getOwner(),quantityBought*bestBid.getPrice());
+            offer.setStockQuantity(offer.getStockQuantity()-quantityBought);
+            offer.getOwner().getOfferedAssets().addCash(-quantityBought*offer.getPrice());
+
+            bestBid = sellOrders.peek();
+        }
+
+        if(offer.getStockQuantity()>0)
         buyOrders.add(offer);
+
     }
 
     public void addBid(OfferBid offer)
     {
-        sellOrders.add(offer);
+        OfferAsk bestAsk=buyOrders.peek();
+        while (bestAsk!=null&&bestAsk.getPrice()>=offer.getPrice()&&offer.getStockQuantity()>0)
+        {
+
+            Integer soldQuantity=Math.min(bestAsk.getStockQuantity(),offer.getStockQuantity());
+            sellOrder(offer.getOwner(),soldQuantity);
+            offer.setStockQuantity(offer.getStockQuantity()-soldQuantity);
+            offer.getOwner().getOfferedAssets().addStocks(-soldQuantity);
+
+            bestAsk=buyOrders.peek();
+        }
+
+        if(offer.getStockQuantity()>0)
+            sellOrders.add(offer);
     }
 
     /***
@@ -49,7 +76,10 @@ public class OrderBooks {
             if(offer.getOwner().equals(owner))
                 toBeRemoved.add(offer);
         }
-        for(Offer offer:toBeRemoved) offers.remove(offer);
+        for(Offer offer:toBeRemoved) {
+            offers.remove(offer);
+            offer.cancel();
+        }
     }
     public OfferBid getBid()
     {

@@ -14,8 +14,13 @@ public class OfferAsk extends Offer {
         super.accept(owner,seller,quantity);
 
 
-        owner.getOfferedAssets().addCash(-quantity*price);
+        owner.getOfferedAssets().addCash(-quantity*getPrice());
 
+    }
+
+    @Override
+    public void cancel() {
+        owner.getOfferedAssets().addCash(-getStockQuantity()*getPrice());
     }
 
 

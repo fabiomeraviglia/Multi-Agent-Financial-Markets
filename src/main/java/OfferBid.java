@@ -17,6 +17,11 @@ public class OfferBid extends Offer{
 
     }
 
+    @Override
+    public void cancel() {
+        owner.getOfferedAssets().addStocks(-getStockQuantity());
+    }
+
     public static class BidComparator implements Comparator<Offer> {
         @Override
         public int compare(Offer x, Offer y) {
