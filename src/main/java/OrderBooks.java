@@ -96,7 +96,7 @@ public class OrderBooks {
     }
     public void buyOrder(Agent client, Integer cash)
     {
-        System.out.println("OrderBooks.buyOrder - CLIENT: "+client+toString()+" cash "+cash);
+
         boolean canBuy=true;
 
         while(canBuy)
@@ -104,7 +104,7 @@ public class OrderBooks {
             Offer bestOffer = sellOrders.peek();
 
             if(bestOffer==null) return;
-            System.out.println("OrderBooks.buyOrder - canBuy="+canBuy+" bestOffer= "+bestOffer.toString());
+
             Integer cost= bestOffer.getCost();
             Integer price = bestOffer.getPrice();
             Agent seller = bestOffer.getOwner();

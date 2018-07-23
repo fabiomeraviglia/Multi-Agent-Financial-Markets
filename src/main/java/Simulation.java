@@ -24,20 +24,20 @@ public class Simulation {
         //shuffle agents ? ordine di esecuzione deve essere casuale
         for(Agent agent : agents)
         {
-            System.out.println("Richiedo azioni ad agente "+agent.toString());
             List<Action> actions = agent.getActions(marketHistory);
-            System.out.println("Eseguo azioni");
             for(Action action: actions) action.executeAction(orderBooks);
-            System.out.println("Terminate azioni per questo agente");
+
         }
 
         addHistory();
-        if(turn%200==0) {
-            marketHistory.plotAskPrices();
 
-            marketHistory.plotBidPrices();
-        }
         turn++;
+    }
+    public void plot()
+    {
+        marketHistory.plotAskPrices();
+
+        marketHistory.plotBidPrices();
     }
     private void addHistory()
     {
@@ -67,6 +67,12 @@ public class Simulation {
                                 .build()
                             );
         }
+        agents.add(new Agent.Builder()
+                .predictor(new PricePredictor())
+                .tactic(new EasyTactic())
+                .intelligenceParameters(new IntelligenceParameters(5))
+                .build()
+        );
 
     }
 }

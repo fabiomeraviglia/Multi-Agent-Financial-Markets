@@ -167,11 +167,13 @@ public static void main(String[] args) {
   Simulation sim = new  Simulation(10);
   sim.initialize();
   System.out.println("Inizio simulazione");
-  for(int i = 0;i<2000;i++)
+  for(int i = 0;i<200000;i++)
     sim.nextTurn();
   sim.nextTurn();
 
   sim.nextTurn();
+  sim.plot();
+    System.out.println("Fine della simulazione");
 
 }
 public static void main2(String[] args)
