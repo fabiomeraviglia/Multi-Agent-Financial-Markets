@@ -61,16 +61,20 @@ public class Simulation {
         for(int i=0;i<numberOfAgents;i++)
         {
             agents.add(new Agent.Builder()
+                                .context(this)
                                 .predictor(new PricePredictor())
                                 .tactic(new RandomTactic())
                                 .intelligenceParameters(new IntelligenceParameters(5))
+                                .assets(new Assets(6000, 20))
                                 .build()
                             );
         }
         agents.add(new Agent.Builder()
+                .context(this)
                 .predictor(new PricePredictor())
                 .tactic(new EasyTactic())
                 .intelligenceParameters(new IntelligenceParameters(5))
+                .assets(new Assets(3000, 10))
                 .build()
         );
 

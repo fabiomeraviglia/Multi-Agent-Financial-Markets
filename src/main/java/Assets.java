@@ -27,6 +27,10 @@ public class Assets {
             throw new RuntimeException("Stocks cannot be a negative value");
     }
 
+    public Assets toCash(Integer bidPrice)
+    {
+        return new Assets(this.cash + this.stocks * bidPrice, 0);
+    }
 
     public static Assets defaultAssets()
     {
@@ -36,6 +40,6 @@ public class Assets {
     }
     @Override
     public String toString() {
-        return "stocks "+stocks+" cash"+cash;
+        return "stocks: "+stocks+", cash: "+cash;
     }
 }

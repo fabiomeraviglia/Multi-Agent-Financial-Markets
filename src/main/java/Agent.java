@@ -7,6 +7,7 @@ public class Agent {
     private IntelligenceParameters parameter;
     private Assets assets;
     private Assets offeredAssets;
+    private Simulation context;
 
 
     private Agent(Agent.Builder builder) {
@@ -14,6 +15,7 @@ public class Agent {
         this.tactic = builder.tactic;
         this.parameter = builder.parameter;
         this.assets = builder.assets;
+        this.context = builder.context;
         offeredAssets= new Assets(0,0);
     }
 
@@ -53,7 +55,11 @@ public class Agent {
     }
     @Override
     public String toString() {
-        return super.toString()+"assets:" +assets.toString()+"offered assets "+offeredAssets.toString();
+        String fairValue = "NaN";
+        if (context.orderBooks != null && context.orderBooks.getBid() != null) {
+            fairValue = assets.toCash(context.orderBooks.getBid().price).getCash().toString();
+        }
+        return super.toString() + ". Assets: [" + assets.toString() + "]" + "; Offered assets [" + offeredAssets.toString() + "]" + "; Total Asset Value: " + fairValue;
     }
 
     public static class Builder  {
@@ -61,7 +67,13 @@ public class Agent {
         private Tactic tactic=Tactic.defaultTactic();
         private IntelligenceParameters parameter=IntelligenceParameters.defaultParameters();
         private Assets assets=Assets.defaultAssets();
+        private Simulation context;
 
+        public Agent.Builder context(Simulation simulation)
+        {
+            this.context = simulation;
+            return this;
+        }
         public Agent.Builder predictor(PricePredictor predictor) {
             this.predictor=predictor;
             return this;

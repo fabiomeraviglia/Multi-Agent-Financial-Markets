@@ -6,7 +6,7 @@ public class RandomTactic extends Tactic {
 
     @Override
     public List<Action> decide(Integer predictedPrice, Agent agent) {
-        Random r= Main.r;
+        Random r = Main.r;
         int outcome= r.nextInt(100);
         Assets assets = agent.getFreeAssets();
         List<Action> actions= new ArrayList<>();
