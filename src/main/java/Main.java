@@ -26,7 +26,7 @@ import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 public class Main {
-  public static Random r = new Random(69);
+  public static Random r = new Random();
   //public static Random r = new Random();
 
   private static List<Float> KStandardDeviations = new ArrayList<Float>() {{
@@ -168,7 +168,9 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    Simulation sim = new Simulation(300);
+    int ROUNDS = 500000;
+
+    Simulation sim = new Simulation(100);
     sim.initialize();
 
     // Get all the agents using the "EasyTactic"
@@ -185,18 +187,19 @@ public class Main {
     for (Agent a : easyTacticAgents) System.out.println(a);
 
     System.out.println("Inizio simulazione");
-    for (int i = 0; i < 500000; i++) {
-      System.out.printf("\rRound %6d/500000", i+1);
+    for (int i = 0; i < ROUNDS; i++) {
+      System.out.printf("\rRound %6d/%d", i+1, ROUNDS);
       sim.nextTurn();
     }
+    sim.nextTurn(); // for debugging pourpose: add a last round for easy breakpoint
     System.out.printf("\n");
     System.out.printf("\n");
     System.out.printf("\n");
 
-    Integer finalWorldValue = sim.agents.stream()
-            .map(agent -> agent.getAssets().toCash(sim.orderBooks.getBid().price).getCash())
-            .reduce(0, (a, b) -> a + b);
-    System.out.println("Valore totale asset nel mondo finale: " + finalWorldValue.toString());
+    //Integer finalWorldValue = sim.agents.stream()
+    //        .map(agent -> agent.getAssets().toCash(sim.orderBooks.getBid().price).getCash())
+    //        .reduce(0, (a, b) -> a + b);
+    //System.out.println("Valore totale asset nel mondo finale: " + finalWorldValue.toString());
 
     System.out.println("Asset finali agenti easy-tactic:");
     for (Agent a : easyTacticAgents) System.out.println(a);

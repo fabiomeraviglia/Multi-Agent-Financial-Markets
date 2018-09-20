@@ -19,6 +19,8 @@ public class Agent {
         offeredAssets= new Assets(0,0);
     }
 
+    public Simulation getContext() { return this.context; }
+
 
     public List<Action> getActions(MarketHistory marketHistory)
     {

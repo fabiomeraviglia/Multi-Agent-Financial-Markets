@@ -17,6 +17,7 @@ public abstract class Offer {
         buyer.getAssets().addStocks(quantity);
         seller.getAssets().addStocks(-quantity);
         stockQuantity-=quantity;
+
     }
     public void setOwner(Agent owner)
     {

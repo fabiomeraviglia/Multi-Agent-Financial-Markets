@@ -11,10 +11,17 @@ public class OrderBooks {
     private  PriorityQueue<OfferAsk> buyOrders;
     private  PriorityQueue<OfferBid> sellOrders;
 
+    private List<String> lastTransactions;
+
+    public void clearLastTransactions() {lastTransactions.clear();}
+
+
     public OrderBooks()
     {
         buyOrders=new PriorityQueue<>(new OfferAsk.AskComparator());
         sellOrders=new PriorityQueue<>(new OfferBid.BidComparator());
+
+        lastTransactions = new ArrayList<>();
 
     }
     void addAsk(OfferAsk offer)
@@ -122,6 +129,7 @@ public class OrderBooks {
             }
 
             bestOffer.accept(client,transactionQuantity);
+            lastTransactions.add("Buyed " + transactionQuantity + " at " + price);
             cash=cash-transactionQuantity*price;
         }
     }
@@ -156,6 +164,8 @@ public class OrderBooks {
             }
 
             bestOffer.accept(client,transactionQuantity);
+
+            lastTransactions.add("Sold " + transactionQuantity + " at " + bestOffer.getPrice());
 
             quantity=quantity-transactionQuantity;
 

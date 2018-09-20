@@ -31,6 +31,8 @@ public class Simulation {
 
         addHistory();
 
+        orderBooks.clearLastTransactions();
+
         turn++;
     }
     public void plot()
@@ -65,18 +67,18 @@ public class Simulation {
                                 .predictor(new PricePredictor())
                                 .tactic(new RandomTactic())
                                 .intelligenceParameters(new IntelligenceParameters(5))
-                                .assets(new Assets(6000, 20))
+                                .assets(new Assets(10000, 10))
                                 .build()
                             );
         }
-        agents.add(new Agent.Builder()
+        /*agents.add(new Agent.Builder()
                 .context(this)
                 .predictor(new PricePredictor())
                 .tactic(new EasyTactic())
                 .intelligenceParameters(new IntelligenceParameters(5))
                 .assets(new Assets(3000, 10))
                 .build()
-        );
+        );*/
 
     }
 }
