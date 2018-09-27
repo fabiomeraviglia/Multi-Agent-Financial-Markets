@@ -168,7 +168,7 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    int ROUNDS = 500000;
+    int ROUNDS = 50000;
 
     Simulation sim = new Simulation(100);
     sim.initialize();

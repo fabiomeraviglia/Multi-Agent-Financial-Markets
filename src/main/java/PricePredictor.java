@@ -9,7 +9,7 @@ public class PricePredictor {
      */
     public Integer getPrediction(List<Integer> inputs)
     {
-        if(inputs.size() < 1) { return 500; }
+        if(inputs.size() < 1) { return 1500; }
         return inputs.get(inputs.size()-1);
     }
 }

@@ -93,7 +93,7 @@ public class Simulation {
             agents.add(new Agent.Builder()
                                 .context(this)
                                 .predictor(new PricePredictor())
-                                .tactic(new RandomTactic())
+                                .tactic(new RandomLogTactic(1))
                                 .intelligenceParameters(new IntelligenceParameters(5))
                                 .assets(new Assets(10000, 10))
                                 .build()
