@@ -1,3 +1,5 @@
+import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 public class Simulation {
@@ -31,9 +33,35 @@ public class Simulation {
 
         addHistory();
 
+        printData();
         orderBooks.clearLastTransactions();
 
         turn++;
+    }
+
+    PrintWriter writer;
+    List<String> listofdata= new ArrayList<String>();
+    private void printData()
+    {
+
+      if(turn==0) try{
+          BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt", false));
+          writer.write("");
+          writer.close();
+      }
+      catch(Exception p) { System.out.println(p.toString());}
+        for(Agent agent : agents)  listofdata.add((agent.getAssets().getCash()+agent.getAssets().getStocks()*marketHistory.getBid())+",");
+        listofdata.add("\r\n");
+      listofdata.add("");
+        if(turn%10000==0)  try{
+            BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt", true));
+            for(String el : listofdata)
+            {
+                writer.append(el);
+            }
+            writer.close();
+        }
+        catch(Exception p) { System.out.println(p.toString());}
     }
     public void plot()
     {
