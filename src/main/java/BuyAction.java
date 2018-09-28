@@ -1,7 +1,7 @@
 public class BuyAction  extends Action{
 
-    OfferAsk offer;
-    public BuyAction(OfferAsk offer) {
+    BuyOffer offer;
+    public BuyAction(BuyOffer offer) {
         this.offer = offer;
     }
 
@@ -11,7 +11,7 @@ public class BuyAction  extends Action{
 
 
         owner.getOfferedAssets().addCash(offer.getCost());
-        orderBooks.addAsk(offer);
+        orderBooks.addBuy(offer);
 
 
     }

@@ -1,10 +1,10 @@
 import java.util.Comparator;
 
-public class OfferBid extends Offer{
-    public OfferBid(Integer stockQuantity, Integer price) {
+public class SellOffer extends Offer{
+    public SellOffer(Integer stockQuantity, Integer price) {
         super(stockQuantity, price, null);
     }
-    public OfferBid(Integer stockQuantity, Integer price, Agent owner) {
+    public SellOffer(Integer stockQuantity, Integer price, Agent owner) {
         super(stockQuantity, price, owner);
     }
 

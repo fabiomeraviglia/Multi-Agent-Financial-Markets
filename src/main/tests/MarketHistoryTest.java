@@ -6,7 +6,7 @@ class MarketHistoryTest {
 
     @org.junit.jupiter.api.Test
     void plotAskPrices() {
-        MarketHistory history = new MarketHistory();
+        /*MarketHistory history = new MarketHistory();
         double value = 0.0;
         for (int i = 0; i < 4000; i++) {
             value = value + Math.random( ) - 0.5;
@@ -17,6 +17,6 @@ class MarketHistoryTest {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }

@@ -18,15 +18,16 @@ private int variance = 10;
 
         if(outcome%64==0)actions.add(new SellNowAction(r.nextInt(assets.getStocks()+1)));
         if(outcome%64==1)actions.add(new BuyNowAction(r.nextInt(assets.getCash()+1)));
-        if(outcome%4==2)actions.add(new SellAction(new OfferBid(r.nextInt(assets.getStocks()+1),chooseSellPrice(predictedPrice))));
+        if(outcome%4==2)actions.add(new SellAction(new SellOffer(
+                r.nextInt(assets.getStocks()+1),
+                Math.max(predictedPrice + (r.nextBoolean() ? 1 : - 1) * r.nextInt(predictedPrice/10),1)
+        )));
         if(outcome%4==3)
         {
-            int buyPrice=chooseBuyPrice(predictedPrice);
-            if(buyPrice<1) buyPrice=1;
-            int stockQuantityToBuy=assets.getCash()/buyPrice;
-            if(stockQuantityToBuy>0) {
-                actions.add(new BuyAction(new OfferAsk(1+r.nextInt(stockQuantityToBuy),buyPrice)));
-            }
+            int sellingPrice= predictedPrice + (r.nextBoolean() ? 1 : - 1) * r.nextInt(predictedPrice/10);
+            if(sellingPrice<1) sellingPrice=1;
+
+            actions.add(new BuyAction(new BuyOffer(r.nextInt(assets.getCash()/(sellingPrice)+1),sellingPrice)));
         }
 
         return actions;
