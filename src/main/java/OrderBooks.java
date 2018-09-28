@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue ;
 
@@ -8,8 +9,8 @@ import java.util.PriorityQueue ;
 public class OrderBooks {
 
     //spread = bid-ask
-    private  PriorityQueue<OfferAsk> buyOrders;
-    private  PriorityQueue<OfferBid> sellOrders;
+    private  PriorityQueue<BuyOffer> buyOrders;
+    private  PriorityQueue<SellOffer> sellOrders;
 
     private List<String> lastTransactions;
 
@@ -18,15 +19,15 @@ public class OrderBooks {
 
     public OrderBooks()
     {
-        buyOrders=new PriorityQueue<>(new OfferAsk.AskComparator());
-        sellOrders=new PriorityQueue<>(new OfferBid.BidComparator());
+        buyOrders=new PriorityQueue<>(new BuyOffer.AskComparator());
+        sellOrders=new PriorityQueue<>(new SellOffer.BidComparator());
 
         lastTransactions = new ArrayList<>();
 
     }
-    void addAsk(OfferAsk offer)
+    void addBuy(BuyOffer offer)
     {
-        OfferBid bestBid = sellOrders.peek();
+        SellOffer bestBid = sellOrders.peek();
         while(bestBid!=null&&bestBid.getPrice()<=offer.getPrice()&&offer.getStockQuantity()>0)
         {
             Integer quantityBought= Math.min(bestBid.getStockQuantity(),offer.getStockQuantity());
@@ -43,9 +44,9 @@ public class OrderBooks {
 
     }
 
-    void addBid(OfferBid offer)
+    void addSell(SellOffer offer)
     {
-        OfferAsk bestAsk=buyOrders.peek();
+        BuyOffer bestAsk=buyOrders.peek();
         while (bestAsk!=null&&bestAsk.getPrice()>=offer.getPrice()&&offer.getStockQuantity()>0)
         {
 
@@ -88,11 +89,11 @@ public class OrderBooks {
             offer.cancel();
         }
     }
-    public OfferBid getBid()
+    public SellOffer getAsk()
     {
         return sellOrders.peek();
     }
-    public OfferAsk getAsk()
+    public BuyOffer getBid()
     {
         return buyOrders.peek();
     }
@@ -170,5 +171,15 @@ public class OrderBooks {
             quantity=quantity-transactionQuantity;
 
         }
+    }
+
+    public List<SellOffer> getSellOrders()
+    {
+        return new ArrayList<>(sellOrders);
+    }
+
+    public List<BuyOffer> getBuyOrders()
+    {
+        return new ArrayList<>(buyOrders);
     }
 }

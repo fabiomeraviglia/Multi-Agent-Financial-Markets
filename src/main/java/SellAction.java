@@ -1,8 +1,8 @@
 public class SellAction extends Action {
 
-    OfferBid offer;
+    SellOffer offer;
 
-    public SellAction(OfferBid offer)
+    public SellAction(SellOffer offer)
     {
         this.offer=offer;
     }
@@ -12,7 +12,7 @@ public class SellAction extends Action {
 
 
             owner.getOfferedAssets().addStocks(offer.getStockQuantity());
-            orderBooks.addBid(offer);
+            orderBooks.addSell(offer);
 
 
     }

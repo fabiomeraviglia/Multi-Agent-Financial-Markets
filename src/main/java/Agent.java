@@ -58,8 +58,8 @@ public class Agent {
     @Override
     public String toString() {
         String fairValue = "NaN";
-        if (context.orderBooks != null && context.orderBooks.getBid() != null) {
-            fairValue = assets.toCash(context.orderBooks.getBid().price).getCash().toString();
+        if (context.orderBooks != null && context.orderBooks.getAsk() != null) {
+            fairValue = assets.toCash(context.orderBooks.getAsk().price).getCash().toString();
         }
         return super.toString() + ". Assets: [" + assets.toString() + "]" + "; Offered assets [" + offeredAssets.toString() + "]" + "; Total Asset Value: " + fairValue;
     }

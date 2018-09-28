@@ -18,8 +18,8 @@ int resetTime=500;
         if(turn>waitingtime)
         {
             int delta = max-min;
-            if(predictedPrice<min+delta/margin && agent.getFreeAssets().getCash()>=predictedPrice) actions.add(new BuyAction(new OfferAsk(1, predictedPrice)));
-            if(predictedPrice>max-delta/margin && agent.getFreeAssets().getStocks()>0) actions.add(new SellAction(new OfferBid(1, predictedPrice)));
+            if(predictedPrice<min+delta/margin && agent.getFreeAssets().getCash()>=predictedPrice) actions.add(new BuyAction(new BuyOffer(1, predictedPrice)));
+            if(predictedPrice>max-delta/margin && agent.getFreeAssets().getStocks()>0) actions.add(new SellAction(new SellOffer(1, predictedPrice)));
         }
         if(turn>resetTime)
         {

@@ -18,7 +18,7 @@ public class RandomTactic extends Tactic {
 
         if(outcome%64==0)actions.add(new SellNowAction(r.nextInt(assets.getStocks()+1)));
         if(outcome%64==1)actions.add(new BuyNowAction(r.nextInt(assets.getCash()+1)));
-        if(outcome%4==2)actions.add(new SellAction(new OfferBid(
+        if(outcome%4==2)actions.add(new SellAction(new SellOffer(
                 r.nextInt(assets.getStocks()+1),
                 Math.max(predictedPrice + (r.nextBoolean() ? 1 : - 1) * r.nextInt(predictedPrice/10),1)
         )));
@@ -27,7 +27,7 @@ public class RandomTactic extends Tactic {
             int sellingPrice= predictedPrice + (r.nextBoolean() ? 1 : - 1) * r.nextInt(predictedPrice/10);
             if(sellingPrice<1) sellingPrice=1;
 
-            actions.add(new BuyAction(new OfferAsk(r.nextInt(assets.getCash()/(sellingPrice)+1),sellingPrice)));
+            actions.add(new BuyAction(new BuyOffer(r.nextInt(assets.getCash()/(sellingPrice)+1),sellingPrice)));
         }
 
         return actions;
