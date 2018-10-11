@@ -11,23 +11,22 @@ private int variance = 10;
         Assets assets = agent.getFreeAssets();
         List<Action> actions= new ArrayList<>();
 
-        if(outcome%64==4)actions.add(new RemoveAllBuyOrdersAction());
-        if(outcome%64==12)actions.add(new RemoveAllSellOrdersAction());
-        if(outcome%64==5)actions.add(new RemoveAllOrdersAction());
+        if(outcome%128==4)actions.add(new RemoveAllBuyOrdersAction());
+        if(outcome%128==12)actions.add(new RemoveAllSellOrdersAction());
+        if(outcome%128==5)actions.add(new RemoveAllOrdersAction());
 
 
-        if(outcome%64==0)actions.add(new SellNowAction(r.nextInt(assets.getStocks()+1)));
-        if(outcome%64==1)actions.add(new BuyNowAction(r.nextInt(assets.getCash()+1)));
+        if(outcome%128==0)actions.add(new SellNowAction(r.nextInt(assets.getStocks()+1)));
+        if(outcome%128==1)actions.add(new BuyNowAction(r.nextInt(assets.getCash()+1)));
         if(outcome%4==2)actions.add(new SellAction(new SellOffer(
                 r.nextInt(assets.getStocks()+1),
-                Math.max(predictedPrice + (r.nextBoolean() ? 1 : - 1) * r.nextInt(predictedPrice/10),1)
+                chooseSellPrice(predictedPrice)
         )));
         if(outcome%4==3)
         {
-            int sellingPrice= predictedPrice + (r.nextBoolean() ? 1 : - 1) * r.nextInt(predictedPrice/10);
-            if(sellingPrice<1) sellingPrice=1;
+            int buyPrice= chooseBuyPrice(predictedPrice);
 
-            actions.add(new BuyAction(new BuyOffer(r.nextInt(assets.getCash()/(sellingPrice)+1),sellingPrice)));
+            actions.add(new BuyAction(new BuyOffer(r.nextInt(assets.getCash()/(buyPrice)+1),buyPrice)));
         }
 
         return actions;
@@ -41,7 +40,7 @@ private int variance = 10;
 
     int chooseBuyPrice(Integer predictedPrice)
     {
-        return predictedPrice+Main.r.nextInt(variance*2+1)-variance;
+        return Math.max(predictedPrice+Main.r.nextInt(variance*2+1)-variance,1);
 
     }
 }
