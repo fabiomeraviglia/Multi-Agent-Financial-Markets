@@ -1,3 +1,4 @@
+import com.sun.rmi.rmid.ExecOptionPermission;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -146,9 +147,9 @@ public class Simulation {
             agents.add(new Agent.Builder()
                     .context(this)
                     .predictor(new PricePredictor())
-                    .tactic(new RandomLogTactic(1))
-                    .intelligenceParameters(new IntelligenceParameters(5))
-                    .assets(new Assets(10000, 10))
+                    .tactic(ExperimentConfiguration.TACTIC)
+                    .intelligenceParameters(ExperimentConfiguration.INTELLIGENCE_PARAMETERS)
+                    .assets(new Assets(ExperimentConfiguration.INITIAL_CASH, ExperimentConfiguration.INITIAL_STOCKS))
                     .build()
             );
         }

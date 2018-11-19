@@ -31,13 +31,6 @@ public class Assets {
     {
         return new Assets(this.cash + this.stocks * bidPrice, 0);
     }
-
-    public static Assets defaultAssets()
-    {
-        int DEFAULT_STOCKS=10;
-        int DEFAULT_CASH=3000;
-        return new Assets(DEFAULT_CASH, DEFAULT_STOCKS);
-    }
     @Override
     public String toString() {
         return "stocks: "+stocks+", cash: "+cash;

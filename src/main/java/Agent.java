@@ -24,7 +24,7 @@ public class Agent {
 
     public List<Action> getActions(MarketHistory marketHistory)
     {
-            Integer predictedPrice= predictor.getPrediction(marketHistory.bid);//dare input al predittore
+            Integer predictedPrice= predictor.getPrediction(marketHistory.ask);//dare input al predittore
 
             List<Action> actions = tactic.decide(predictedPrice, this);
             for(Action action : actions) action.setOwner(this);
@@ -68,7 +68,7 @@ public class Agent {
         private PricePredictor predictor;
         private Tactic tactic=Tactic.defaultTactic();
         private IntelligenceParameters parameter=IntelligenceParameters.defaultParameters();
-        private Assets assets=Assets.defaultAssets();
+        private Assets assets=new Assets(ExperimentConfiguration.INITIAL_CASH,ExperimentConfiguration.INITIAL_STOCKS);
         private Simulation context;
 
         public Agent.Builder context(Simulation simulation)

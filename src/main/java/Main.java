@@ -11,10 +11,10 @@ public class Main
 
   public static void main(String[] args)
   {
-    int ROUNDS = 50000;
+    int ROUNDS = ExperimentConfiguration.ROUNDS;
 
     System.out.println("Inizializzazione simulazione.");
-    Simulation sim = new Simulation(100);
+    Simulation sim = new Simulation(ExperimentConfiguration.NUMBER_OF_AGENTS);
 
     System.out.println("Inizializzazione grafici");
     PlotManager pm = new PlotManager();
@@ -26,7 +26,7 @@ public class Main
       System.out.printf("\rRound %6d/%d", i+1, ROUNDS);
       sim.nextTurn();
 
-      if (i % 500 == 0) {
+      if (i % ExperimentConfiguration.ROUNDS_TO_PLOT == 0) {
         for(Observable o : PlotManager.watchedObservables)
         {
           pm.updatePlot(o, sim.getObservables().get(o));

@@ -19,20 +19,19 @@ public class RandomLogTactic extends RandomTactic {
      */
     public RandomLogTactic(double variance)
     {
-
         this.variance=variance;
     }
     @Override
     int chooseSellPrice(Integer predictedPrice) {
             double r = 1000/ (Main.r.nextDouble()*1000+100); //r numero casuale tra 10 e 0.909 con distribuzione 1/x  in realtà: (1000/(x*1000+100)
             r=Math.pow(r,variance);
-            return (int)(((double)(predictedPrice))*r);
+            return Math.max((int)(((double)(predictedPrice))*r),1);
     }
 
     @Override
     int chooseBuyPrice(Integer predictedPrice) {
         double r = 1000/ (Main.r.nextDouble()*1000+100); //r numero casuale tra 10 e 0.909 con distribuzione 1/x
         r=Math.pow(r,variance);
-        return (int)(((double)(predictedPrice))/r);
+        return Math.max((int)(((double)(predictedPrice))/r),1);
     }
 }
