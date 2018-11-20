@@ -5,7 +5,7 @@ import java.util.Random;
 /***
  * Tattica random che ha come distribuzione di probabilità !/x in modo da ottenere una distribuzione cumulativa simile ad una funzione logaritmica
  */
-public class RandomLogTactic extends RandomTactic {
+public class RandomLogTacticFabio extends RandomTactic {
 
     double variance;
 
@@ -17,19 +17,21 @@ public class RandomLogTactic extends RandomTactic {
      * variance = 0.1 (variazioni di circa 10% rispetto a media)
      *
      */
-    public RandomLogTactic(double variance)
+    public RandomLogTacticFabio(double variance)
     {
-        this.variance = variance;
+        this.variance=variance;
     }
     @Override
     int chooseSellPrice(Integer predictedPrice) {
-        double p = - Math.log(1 - Main.r.nextDouble()) * variance;
-        return (int)Math.max((predictedPrice)*(1+p), 1);
+        double r = 1000/ (Main.r.nextDouble()*1000+100); //r numero casuale tra 10 e 0.909 con distribuzione 1/x  in realtà: (1000/(x*1000+100)
+        r=Math.pow(r,variance);
+        return Math.max((int)(((double)(predictedPrice))*r),1);
     }
 
     @Override
     int chooseBuyPrice(Integer predictedPrice) {
-        double p = - Math.log(1 - Main.r.nextDouble()) * variance;
-        return (int)Math.max((predictedPrice)/(1+p),1);
+        double r = 1000/ (Main.r.nextDouble()*1000+100); //r numero casuale tra 10 e 0.909 con distribuzione 1/x
+        r=Math.pow(r,variance);
+        return Math.max((int)(((double)(predictedPrice))/r),1);
     }
 }

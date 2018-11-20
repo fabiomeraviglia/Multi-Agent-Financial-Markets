@@ -109,6 +109,7 @@ public class Simulation {
     public void nextTurn()
     {
         Collections.shuffle(agents);
+        orderBooks.clearTransactions();
         for(Agent agent : agents)
         {
             List<Action> actions = agent.getActions(marketHistory);
@@ -116,6 +117,7 @@ public class Simulation {
         }
 
         addHistory();
+
 
         updateObservables();
 
