@@ -2,7 +2,7 @@ public class ExperimentConfiguration {
 
     public static int ROUNDS = 50000;
      public static int NUMBER_OF_AGENTS = 200;
-    public static Tactic TACTIC = new RandomTactic();
+    public static Tactic TACTIC = new RandomLogTacticFabio(1);
     public static IntelligenceParameters INTELLIGENCE_PARAMETERS= new IntelligenceParameters(5);
     public static int INITIAL_STOCKS=10;
     public static int INITIAL_CASH=2000;

@@ -23,7 +23,7 @@ public class Main
     System.out.println("Inizio simulazione.");
     for (int i = 0; i < ROUNDS; i++)
     {
-      System.out.printf("\rRound %6d/%d", i+1, ROUNDS);
+      System.out.printf("\rRound %6d/%d - Current price:%5d Number of transactions: %7d", i+1, ROUNDS,sim.marketHistory.getCurrentPrice(),sim.orderBooks.getTransactions().size());
       sim.nextTurn();
 
       if (i % ExperimentConfiguration.ROUNDS_TO_PLOT == 0) {
