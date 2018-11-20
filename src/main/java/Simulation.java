@@ -117,8 +117,6 @@ public class Simulation {
 
         addHistory();
 
-        orderBooks.clearLastTransactions();
-
         updateObservables();
 
         turn++;
@@ -134,6 +132,9 @@ public class Simulation {
         if(bid!=null)
             marketHistory.addBid(bid.getPrice());
 
+        List<Transaction> transactions = orderBooks.getTransactions();
+        if(!transactions.isEmpty())
+        marketHistory.addCurrentPrice(transactions.get(transactions.size()-1).stockPrice);
     }
     /**
      * Dovrebbe restituire una lista di agenti già configurati, si potrà fare lettura da file

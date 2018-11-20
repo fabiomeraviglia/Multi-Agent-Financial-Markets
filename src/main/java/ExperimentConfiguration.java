@@ -7,7 +7,7 @@ public class ExperimentConfiguration {
     public static int INITIAL_STOCKS=10;
     public static int INITIAL_CASH=2000;
 
-    public static int INITIAL_PRICE_PREDICTION = 500;
+    public static int INITIAL_PRICE = 500;
 
 
     public static int ROUNDS_TO_PLOT=500;

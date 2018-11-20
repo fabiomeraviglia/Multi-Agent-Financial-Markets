@@ -55,6 +55,6 @@ public abstract class Offer {
 
     @Override
     public String toString() {
-        return "Offer: stockQnt"+stockQuantity+" price"+price+" OWner "+owner.toString();
+        return "Offer: stockQnt"+stockQuantity+" price"+price+" Owner "+owner.toString();
     }
 }

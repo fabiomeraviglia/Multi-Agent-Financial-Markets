@@ -12,9 +12,9 @@ public class OrderBooks {
     private  PriorityQueue<BuyOffer> buyOrders;
     private  PriorityQueue<SellOffer> sellOrders;
 
-    private List<String> lastTransactions;
+    private List<Transaction> transactions  = new ArrayList<>();
 
-    public void clearLastTransactions() {lastTransactions.clear();}
+    public void clearTransactions() {transactions.clear();}
 
 
     public OrderBooks()
@@ -22,7 +22,7 @@ public class OrderBooks {
         buyOrders=new PriorityQueue<>(new BuyOffer.AskComparator());
         sellOrders=new PriorityQueue<>(new SellOffer.BidComparator());
 
-        lastTransactions = new ArrayList<>();
+
 
     }
     void addBuy(BuyOffer offer)
@@ -46,16 +46,16 @@ public class OrderBooks {
 
     void addSell(SellOffer offer)
     {
-        BuyOffer bestAsk=buyOrders.peek();
-        while (bestAsk!=null&&bestAsk.getPrice()>=offer.getPrice()&&offer.getStockQuantity()>0)
+        BuyOffer bestBuyOffer=buyOrders.peek();
+        while (bestBuyOffer!=null&&bestBuyOffer.getPrice()>=offer.getPrice()&&offer.getStockQuantity()>0)
         {
 
-            Integer soldQuantity=Math.min(bestAsk.getStockQuantity(),offer.getStockQuantity());
+            Integer soldQuantity=Math.min(bestBuyOffer.getStockQuantity(),offer.getStockQuantity());
             sellOrder(offer.getOwner(),soldQuantity);
             offer.setStockQuantity(offer.getStockQuantity()-soldQuantity);
             offer.getOwner().getOfferedAssets().addStocks(-soldQuantity);
 
-            bestAsk=buyOrders.peek();
+            bestBuyOffer=buyOrders.peek();
         }
 
         if(offer.getStockQuantity()>0)
@@ -98,11 +98,7 @@ public class OrderBooks {
         return buyOrders.peek();
     }
 
-    public void sellOrder(Agent client, Integer quantity)
-    {
-        transaction(buyOrders,client,quantity);
-    }
-    public void buyOrder(Agent client, Integer cash)
+    public void buyOrder(Agent buyer, Integer cash)
     {
 
         boolean canBuy=true;
@@ -129,8 +125,8 @@ public class OrderBooks {
                 canBuy=false;
             }
 
-            bestOffer.accept(client,transactionQuantity);
-            lastTransactions.add("Buyed " + transactionQuantity + " at " + price);
+            bestOffer.accept(buyer,transactionQuantity);
+            transactions.add(new Transaction(buyer,seller,transactionQuantity*price,transactionQuantity, price));
             cash=cash-transactionQuantity*price;
         }
     }
@@ -139,35 +135,34 @@ public class OrderBooks {
      * nel caso l'offerta sia di ask, client vende stock, se offerta è offerBid, client compra gli stock
      * nel caso la richiesta di quantity non sia soddisfatta dalla prima offerta, si passa al secondo miglior offerente e così via
      * le offerte soddisfatte presenti in orders vengono eliminate dalla coda
-     * @param client cliente che richiede di effettuare la transazione
+     * @param seller cliente che richiede di effettuare la transazione
      * @param quantity quantita di stock venduti o comprati dal cliente
      */
-    private void transaction(PriorityQueue<? extends Offer> orders, Agent client, Integer quantity)
+    public void sellOrder(Agent seller, Integer quantity)
     {
 
         while(quantity>0)
         {
-            Offer bestOffer = orders.peek();
+            Offer bestOffer = buyOrders.peek();
             if(bestOffer==null) return;
 
             Integer offerQuantity= bestOffer.getStockQuantity();
-            Agent server = bestOffer.getOwner();
+            Agent buyer = bestOffer.getOwner();
 
             Integer transactionQuantity;
             if(offerQuantity<=quantity)
             {//se questa offerta viene completamente soddisfatta, la rimuovo
                 transactionQuantity=offerQuantity;
-                orders.poll();//rimuovo offerta
+                buyOrders.poll();//rimuovo offerta
             }
             else
             {
                 transactionQuantity=quantity;
             }
 
-            bestOffer.accept(client,transactionQuantity);
+            bestOffer.accept(seller,transactionQuantity);
 
-            lastTransactions.add("Sold " + transactionQuantity + " at " + bestOffer.getPrice());
-
+            transactions.add(new Transaction(buyer,seller,transactionQuantity*bestOffer.getPrice(),transactionQuantity, bestOffer.getPrice()));
             quantity=quantity-transactionQuantity;
 
         }
@@ -181,5 +176,10 @@ public class OrderBooks {
     public List<BuyOffer> getBuyOrders()
     {
         return new ArrayList<>(buyOrders);
+    }
+
+    public List<Transaction> getTransactions()
+    {
+        return transactions;
     }
 }

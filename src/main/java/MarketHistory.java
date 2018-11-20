@@ -7,6 +7,7 @@ public class MarketHistory {
 
     List<Integer> bid;
     List<Integer> ask;
+    List<Integer> prices = new ArrayList<>();
 
     public MarketHistory() {
         bid=new ArrayList<>();
@@ -22,16 +23,13 @@ public class MarketHistory {
     public void addAsk(Integer ask) { this.ask.add(ask); }
     public Integer getAsk(int index) { return this.ask.get(index); }
     public int askSize() { return this.ask.size(); }
-    //public void plotAskPrices() { this.plot(this.ask, "Ask Prices", "Ask"); }
 
-    /*private void plot(List<Integer> data_Il, String title, String label) {
-        Double[] data_Da = new Double[data_Il.size()];
-        for (int i = 0; i < data_Da.length; i++) {
-            data_Da[i] = data_Il.get(i).doubleValue();
-        }
-        final ObservablePlot plot = new ObservablePlot(title, label, data_Da);
-        plot.pack();
-        RefineryUtilities.positionFrameRandomly(plot);
-        plot.setVisible(true);
-    }*/
+    public void addCurrentPrice(int stockPrice) {
+        prices.add(stockPrice);
+    }
+    public Integer getCurrentPrice()
+    {
+        if(prices.isEmpty()) return ExperimentConfiguration.INITIAL_PRICE;
+        return prices.get(prices.size()-1);
+    }
 }

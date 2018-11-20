@@ -9,7 +9,12 @@ public class PricePredictor {
      */
     public Integer getPrediction(List<Integer> inputs)
     {
-        if(inputs.size() < 1) { return ExperimentConfiguration.INITIAL_PRICE_PREDICTION; }
+        if(inputs.size() < 1) { return ExperimentConfiguration.INITIAL_PRICE; }
         return inputs.get(inputs.size()-1);
+    }
+    public Integer getPrediction(Integer input)
+    {
+
+        return input;
     }
 }

@@ -24,7 +24,7 @@ public class Agent {
 
     public List<Action> getActions(MarketHistory marketHistory)
     {
-            Integer predictedPrice= predictor.getPrediction(marketHistory.ask);//dare input al predittore
+            Integer predictedPrice= predictor.getPrediction(marketHistory.getCurrentPrice());//dare input al predittore
 
             List<Action> actions = tactic.decide(predictedPrice, this);
             for(Action action : actions) action.setOwner(this);
