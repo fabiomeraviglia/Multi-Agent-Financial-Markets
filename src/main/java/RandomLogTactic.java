@@ -19,18 +19,18 @@ public class RandomLogTactic extends RandomTactic {
      */
     public RandomLogTactic(double variance)
     {
-        this.variance=variance;
+        this.variance = variance;
     }
     @Override
     int chooseSellPrice(Integer predictedPrice) {
-        double p = (Math.log(1-Main.r.nextDouble())/(-variance));
-        return Math.max(predictedPrice+(int)p,1);
+        double p = - Math.log(1 - Main.r.nextDouble()) * variance;
+        return (int)Math.max((predictedPrice)*(1+p), 1);
     }
 
     @Override
     int chooseBuyPrice(Integer predictedPrice) {
-        double p = (Math.log(1-Main.r.nextDouble())/(-variance));
-        return Math.max(predictedPrice-(int)p,1);
+        double p = - Math.log(1 - Main.r.nextDouble()) * variance;
+        return (int)Math.max((predictedPrice)/(1+p),1);
 
     }
 }

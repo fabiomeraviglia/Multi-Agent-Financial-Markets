@@ -16,8 +16,8 @@ private int variance = 10;
         if(outcome%128==5)actions.add(new RemoveAllOrdersAction());
 
 
-        if(outcome%128==0)actions.add(new SellNowAction(r.nextInt(assets.getStocks()+1)));
-        if(outcome%128==1)actions.add(new BuyNowAction(r.nextInt(assets.getCash()+1)));
+        if(outcome%32==0)actions.add(new SellNowAction(r.nextInt(assets.getStocks()+1)));
+        if(outcome%32==1)actions.add(new BuyNowAction(r.nextInt(assets.getCash()+1)));
         if(outcome%4==2)actions.add(new SellAction(new SellOffer(
                 r.nextInt(assets.getStocks()+1),
                 chooseSellPrice(predictedPrice)
