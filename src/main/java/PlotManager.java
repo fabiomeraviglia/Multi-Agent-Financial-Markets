@@ -12,20 +12,29 @@ public class PlotManager
     private static final Map<Observable, Integer[]> observablePlotParams;
     static
     {
+        // Set Observables To be plotted
         List<Observable> tmpWatched = new ArrayList<>();
         tmpWatched.add(Observable.BID_PRICE_HISTORY);
         tmpWatched.add(Observable.ASK_PRICE_HISTORY);
         tmpWatched.add(Observable.MARKET_DEPTH);
+        tmpWatched.add(Observable.LOG_RETURNS);
+        tmpWatched.add(Observable.LOG_SPREAD);
 
+        // Set plot label for each observable
         Map<Observable, String> tmpLabelMap = new HashMap<>();
         tmpLabelMap.put(Observable.BID_PRICE_HISTORY, "Bid Price");
         tmpLabelMap.put(Observable.ASK_PRICE_HISTORY, "Ask Price");
         tmpLabelMap.put(Observable.MARKET_DEPTH, "Market Depth");
+        tmpLabelMap.put(Observable.LOG_RETURNS, "Logaritmic Returns");
+        tmpLabelMap.put(Observable.LOG_SPREAD, "Spread");
 
+        // Set plot parameters for each observable
         Map<Observable, Integer[]> tmpParamMap = new HashMap<>();
         tmpParamMap.put(Observable.BID_PRICE_HISTORY, new Integer[]{600, 300, 10000, 1, 1});
         tmpParamMap.put(Observable.ASK_PRICE_HISTORY, new Integer[]{600, 300, 10000, 1, 1});
         tmpParamMap.put(Observable.MARKET_DEPTH, new Integer[]{600, 300, 5000, 0, 0});
+        tmpParamMap.put(Observable.LOG_RETURNS, new Integer[]{600, 300, 10000, 1, 1});
+        tmpParamMap.put(Observable.LOG_SPREAD, new Integer[]{600, 300, 10000, 1, 1});
 
         watchedObservables = Collections.unmodifiableList(tmpWatched);
         observableLabels = Collections.unmodifiableMap(tmpLabelMap);
@@ -48,7 +57,7 @@ public class PlotManager
         }
     }
 
-    public void updatePlot(Observable o, List<Pair<Integer,Integer>> newData)
+    public void updatePlot(Observable o, List<Pair<Integer,Double>> newData)
     {
         plots.get(o).updateChart(newData);
     }

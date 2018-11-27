@@ -42,7 +42,7 @@ public class ObservablePlot extends ApplicationFrame {
         this.crop = crop;
         this.pad = pad;
 
-        List<Pair<Integer, Integer>> emptyData = new ArrayList<>();
+        List<Pair<Integer, Double>> emptyData = new ArrayList<>();
         chart = createChart(createDataset(emptyData));
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(dims);
@@ -50,12 +50,12 @@ public class ObservablePlot extends ApplicationFrame {
         setContentPane(chartPanel);
     }
 
-    private XYDataset createDataset(List<Pair<Integer, Integer>> data)
+    private XYDataset createDataset(List<Pair<Integer, Double>> data)
     {
         XYSeriesCollection dataset = new XYSeriesCollection();
         XYSeries series = new XYSeries(title);
         List<Pair<Double, Double>> convertedData = data.stream()
-                .map(d -> new Pair<>((double)d.getKey(), (double)d.getValue()))
+                .map(d -> new Pair<>((double)d.getKey(), d.getValue()))
                 .collect(Collectors.toList());
 
         if(crop && convertedData.size() > resolution)
@@ -98,7 +98,7 @@ public class ObservablePlot extends ApplicationFrame {
         );
     }
 
-    public void updateChart(List<Pair<Integer, Integer>> newData)
+    public void updateChart(List<Pair<Integer, Double>> newData)
     {
         XYDataset newDataset = createDataset(newData);
         chart.getXYPlot().setDataset(newDataset);

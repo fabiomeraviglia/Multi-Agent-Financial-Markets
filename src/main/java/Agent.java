@@ -4,7 +4,6 @@ public class Agent {
 
     private PricePredictor predictor;
     private Tactic tactic;
-    private IntelligenceParameters parameter;
     private Assets assets;
     private Assets offeredAssets;
     private Simulation context;
@@ -13,7 +12,6 @@ public class Agent {
     private Agent(Agent.Builder builder) {
         this.predictor = builder.predictor;
         this.tactic = builder.tactic;
-        this.parameter = builder.parameter;
         this.assets = builder.assets;
         this.context = builder.context;
         offeredAssets= new Assets(0,0);
@@ -40,16 +38,12 @@ public class Agent {
         return tactic;
     }
 
-    public IntelligenceParameters getParameter() {
-        return parameter;
-    }
-
     public Assets getAssets() {
         return assets;
     }
     public Assets getOfferedAssets() {
         return offeredAssets;
-    } //si possono trovare nomi migliori
+    }
     public Assets getFreeAssets(){
         return new Assets(
                 assets.getCash()-offeredAssets.getCash(),
@@ -66,9 +60,10 @@ public class Agent {
 
     public static class Builder  {
         private PricePredictor predictor;
-        private Tactic tactic=Tactic.defaultTactic();
-        private IntelligenceParameters parameter=IntelligenceParameters.defaultParameters();
-        private Assets assets=new Assets(ExperimentConfiguration.INITIAL_CASH,ExperimentConfiguration.INITIAL_STOCKS);
+        private Tactic tactic = Tactic.defaultTactic();
+        private Assets assets = new Assets(
+          ExperimentConfiguration.INITIAL_CASH,
+          ExperimentConfiguration.INITIAL_STOCKS);
         private Simulation context;
 
         public Agent.Builder context(Simulation simulation)
@@ -82,10 +77,6 @@ public class Agent {
         }
         public Agent.Builder tactic(Tactic tactic) {
             this.tactic=tactic;
-            return this;
-        }
-        public Agent.Builder intelligenceParameters(IntelligenceParameters parameter) {
-            this.parameter=parameter;
             return this;
         }
         public Agent.Builder assets(Assets assets) {

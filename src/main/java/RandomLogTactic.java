@@ -1,9 +1,6 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 /***
- * Tattica random che ha come distribuzione di probabilità !/x in modo da ottenere una distribuzione cumulativa simile ad una funzione logaritmica
+ * Tattica random che ha come distribuzione di probabilità !/x in modo da ottenere una distribuzione cumulativa
+ * simile ad una funzione logaritmica
  */
 public class RandomLogTactic extends RandomTactic {
 

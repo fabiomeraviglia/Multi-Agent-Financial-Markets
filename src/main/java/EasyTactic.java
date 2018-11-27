@@ -13,22 +13,28 @@ int resetTime=500;
     public List<Action> decide(Integer predictedPrice, Agent agent) {
         List<Action> actions= new ArrayList<>();
 
-        if(predictedPrice<min) min=predictedPrice;
-        if(predictedPrice>max) max=predictedPrice;
-        if(turn>waitingtime)
+        if(predictedPrice < min) { min = predictedPrice; }
+        if(predictedPrice > max) { max = predictedPrice; }
+        if(turn > waitingtime)
         {
-            int delta = max-min;
-            if(predictedPrice<min+delta/margin && agent.getFreeAssets().getCash()>=predictedPrice) actions.add(new BuyAction(new BuyOffer(1, predictedPrice)));
-            if(predictedPrice>max-delta/margin && agent.getFreeAssets().getStocks()>0) actions.add(new SellAction(new SellOffer(1, predictedPrice)));
+            int delta = max - min;
+            if ((predictedPrice < min + delta / margin) && (agent.getFreeAssets().getCash() >= predictedPrice))
+            {
+                actions.add(new BuyAction(new BuyOffer(1, predictedPrice)));
+            }
+            if ((predictedPrice > max - delta / margin) && (agent.getFreeAssets().getStocks() > 0))
+            {
+                actions.add(new SellAction(new SellOffer(1, predictedPrice)));
+            }
         }
-        if(turn>resetTime)
+        if(turn > resetTime)
         {
-            actions.add(new RemoveAllOrdersAction());//ogni tanto elimina tutto per liberarsi delle offerte che magari non verranno mai soddisfatte
-            turn=0;
-            max=predictedPrice;
-            min=predictedPrice;
+            actions.add(new RemoveAllOrdersAction());
+            turn = 0;
+            max = predictedPrice;
+            min = predictedPrice;
         }
         turn++;
-        return  actions;
+        return actions;
     }
 }

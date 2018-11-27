@@ -2,14 +2,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class RandomTactic extends Tactic {
-private int variance = 10;
+public class RandomTactic extends Tactic
+{
+    private int variance = 10;
+
     @Override
-    public List<Action> decide(Integer predictedPrice, Agent agent) {
-        Random r= Main.r;
-        int outcome= r.nextInt(100);
+    public List<Action> decide(Integer predictedPrice, Agent agent)
+    {
+        Random r = Main.r;
+        int outcome = r.nextInt();
         Assets assets = agent.getFreeAssets();
-        List<Action> actions= new ArrayList<>();
+        List<Action> actions = new ArrayList<>();
 
         if(outcome%128==4)actions.add(new RemoveAllBuyOrdersAction());
         if(outcome%128==12)actions.add(new RemoveAllSellOrdersAction());
