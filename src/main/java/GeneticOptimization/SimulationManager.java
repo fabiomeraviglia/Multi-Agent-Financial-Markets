@@ -1,41 +1,95 @@
 package GeneticOptimization;
 
+import Simulation.ExperimentConfiguration;
 import Simulation.Simulation;
 
-public class SimulationManager implements Runnable {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-    private SimulationResults results = null;
-    private Chromosome chromosome ;
-    public SimulationManager(Chromosome chromosome)
+public class SimulationManager  {
+
+    private ChromosomeFitness[] results=null;
+    private Chromosome[] chromosomes;
+    public SimulationManager(Chromosome[] chromosomes)
     {
-        this.chromosome=chromosome;
-    }
-
-    @Override
-    public void run() {
-
-        Simulation simulation =  SimulationManager.getSimulation(chromosome);
-        runSimulation(simulation);
-
+        this.chromosomes=chromosomes;
     }
 
 
+    public void runSimulations() {
 
-    public static Simulation getSimulation(Chromosome chromosome)
-    {
+        SimulationExecutor[] simulationExecutors = getSimulationExecutors();
 
-        return null;
+
+        ExecutorService executor = Executors.newFixedThreadPool(simulationExecutors.length);
+
+        for (int i = 0; i < simulationExecutors.length; i++) {
+            executor.execute(simulationExecutors[i]);
+        }
+
+        executor.shutdown();
+
+        try {
+            executor.awaitTermination(2,TimeUnit.HOURS);//timeout di 2 ore
+        }
+        catch (InterruptedException ie)
+        {
+            throw new RuntimeException("Timeout");
+        }
+
+        storeResults(simulationExecutors);
+
     }
-    private void runSimulation(Simulation simulation)
-    {
 
+    private void storeResults(SimulationExecutor[] simulationExecutors) {
+        int n = simulationExecutors.length;
+        results = new ChromosomeFitness[n];
+
+        for(int i =0; i<n;i++)
+        {
+            SimulationResults result = simulationExecutors[i].getResults();
+            Double fitness= FitnessCalculator.getFitness(result);
+            Chromosome chromosome = chromosomes[i];
+            results[i] = new ChromosomeFitness(chromosome, fitness);
+        }
+    }
+
+    private SimulationExecutor[] getSimulationExecutors() {
+        int n = chromosomes.length;
+        SimulationExecutor[] simulationExecutors = new SimulationExecutor[n];
+        for(int i=0;i<chromosomes.length;i++)
+        {
+            simulationExecutors[i] = SimulationManager.getSimulationExecutor(chromosomes[i]);
+        }
+        return  simulationExecutors;
     }
 
 
-    public SimulationManager getSimulationResults()
+    public static SimulationExecutor getSimulationExecutor(Chromosome chromosome)
     {
 
-        return null;
+
+
+        ExperimentConfiguration configuration = new ExperimentConfiguration();
+
+        //assegna a experimentConfiguration i valori di chromosome
+
+
+        Simulation simulation = new Simulation(configuration);
+
+
+        SimulationExecutor simulationExecutor = new SimulationExecutor(simulation);
+
+
+
+        return  simulationExecutor;
+    }
+
+
+    public ChromosomeFitness[] getSimulationResults()
+    {
+        return results;
     }
 
 }

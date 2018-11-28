@@ -18,7 +18,7 @@ public class Main
     int ROUNDS = ExperimentConfiguration.ROUNDS;
 
     System.out.println("Inizializzazione simulazione.");
-    Simulation sim = new Simulation(ExperimentConfiguration.NUMBER_OF_AGENTS);
+    Simulation sim = new Simulation(new ExperimentConfiguration());
 
     System.out.println("Inizializzazione grafici");
     PlotManager pm = new PlotManager();

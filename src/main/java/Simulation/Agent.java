@@ -67,8 +67,8 @@ public class Agent {
         private PricePredictor predictor;
         private Tactic tactic = Tactic.defaultTactic();
         private Assets assets = new Assets(
-          ExperimentConfiguration.INITIAL_CASH,
-          ExperimentConfiguration.INITIAL_STOCKS);
+          0,
+          0);
         private Simulation context;
 
         public Agent.Builder context(Simulation simulation)

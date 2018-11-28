@@ -8,10 +8,11 @@ public class MarketHistory {
     List<Integer> bid;
     List<Integer> ask;
     List<Integer> prices = new ArrayList<>();
-
-    public MarketHistory() {
+    int initialPrice;
+    public MarketHistory(int initialPrice) {
         bid=new ArrayList<>();
         ask=new ArrayList<>();
+        this.initialPrice=initialPrice;
     }
 
     public void addBid(Integer bid) { this.bid.add(bid); }
@@ -29,7 +30,7 @@ public class MarketHistory {
     }
     public Integer getCurrentPrice()
     {
-        if(prices.isEmpty()) return ExperimentConfiguration.INITIAL_PRICE;
+        if(prices.isEmpty()) return initialPrice;
         return prices.get(prices.size()-1);
     }
 }

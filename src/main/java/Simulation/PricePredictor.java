@@ -9,9 +9,14 @@ public class PricePredictor {
      * @param inputs
      * @return
      */
+    int initialPrice;
+    public PricePredictor(int initialPrice)
+    {
+        this.initialPrice = initialPrice;
+    }
     public Integer getPrediction(List<Integer> inputs)
     {
-        if(inputs.size() < 1) { return ExperimentConfiguration.INITIAL_PRICE; }
+        if(inputs.size() < 1) { return initialPrice; }
         return inputs.get(inputs.size()-1);
     }
     public Integer getPrediction(Integer input)

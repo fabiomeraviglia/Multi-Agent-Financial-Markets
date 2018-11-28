@@ -17,10 +17,11 @@ public class Simulation {
     public MarketHistory marketHistory;
     public OrderBooks orderBooks;
     public Integer turn, numberOfAgents;
-
-    public Simulation(int numberOfAgents)
+    ExperimentConfiguration configuration;
+    public Simulation(ExperimentConfiguration configuration)
     {
-        this.numberOfAgents = numberOfAgents;
+        this.configuration=configuration;
+        this.numberOfAgents = configuration.NUMBER_OF_AGENTS;
         initialize();
     }
 
@@ -28,7 +29,7 @@ public class Simulation {
     {
         turn = 0;
         createAgents();
-        marketHistory = new MarketHistory();
+        marketHistory = new MarketHistory(configuration.INITIAL_PRICE);
         orderBooks = new OrderBooks();
 
         initializeObservables();
@@ -180,7 +181,7 @@ public class Simulation {
         }
         else
         {
-            marketHistory.addAsk(ExperimentConfiguration.INITIAL_PRICE);
+            marketHistory.addAsk(configuration.INITIAL_PRICE);
         }
 
         List<Transaction> transactions = orderBooks.getTransactions();
@@ -201,9 +202,9 @@ public class Simulation {
         for(int i=0;i<numberOfAgents;i++) {
             agents.add(new Agent.Builder()
                     .context(this)
-                    .predictor(new PricePredictor())
-                    .tactic(ExperimentConfiguration.TACTIC)
-                    .assets(new Assets(ExperimentConfiguration.INITIAL_CASH, ExperimentConfiguration.INITIAL_STOCKS))
+                    .predictor(new PricePredictor(configuration.INITIAL_PRICE))
+                    .tactic(configuration.TACTIC)
+                    .assets(new Assets(configuration.INITIAL_CASH, configuration.INITIAL_STOCKS))
                     .build()
             );
         }

@@ -3,7 +3,10 @@ package GeneticOptimization;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.jetbrains.annotations.NotNull;
 
-public class ChromosomeFitness implements Comparable<ChromosomeFitness>{
+import java.io.Serializable;
+
+public class ChromosomeFitness implements Comparable<ChromosomeFitness>, Serializable {
+    private static final long serialVersionUID = 5524308920998484411L;
     private Chromosome chromosome;
     private Double fitness;
     public ChromosomeFitness(Chromosome chromosome, Double fitness)

@@ -1,41 +1,91 @@
 package GeneticOptimization;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.io.Serializable;
+import java.util.*;
 
-public class GeneticOptimizationSimulation {
+public class GeneticOptimizationSimulation implements Serializable{
 
+    private static final long serialVersionUID = 127988556026189305L;
     List<Chromosome> chromosomes = new ArrayList<>();
-    HashSet<ChromosomeFitness> chromosomesFitness = new HashSet<ChromosomeFitness>();
-    List<ChromosomeFitness> bestChromosomes = new ArrayList<>();
+    HashMap<Chromosome,ChromosomeFitness> chromosomesFitness = new HashMap<>();
+    HashSet<Chromosome> bestChromosomes = new HashSet<>();//enable elitism
     List<Double> bestFitnessForGenerations = new ArrayList<>();
-    private  double MUTATION_RATE, CROSSOVER_RATE;
-    private int CHROMOSOMES_NUMBER, INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS;
+    private double MUTATION_RATE=GeneticExperimentHyperparameters.MUTATION_RATE,
+            CROSSOVER_RATE=GeneticExperimentHyperparameters.CROSSOVER_RATE,
+            ELITISM_RATE = GeneticExperimentHyperparameters.ELITISM_RATE;
+    private int POPULATION_SIZE =GeneticExperimentHyperparameters.POPULATION_SIZE
+            , INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS= GeneticExperimentHyperparameters.INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS,
+            ROUNDS_OF_SIMULATION = GeneticExperimentHyperparameters.ROUNDS_OF_SIMULATION;
+    private int ELITE_SIZE = getEliteSize();
     public GeneticOptimizationSimulation()
     {
-
-
+        this.createChromosomes();
     }
+
     public void runOptimization(long maxExecutionTime)
     {
-        long initialTime = System.currentTimeMillis();
-        createChromosomes();
+        evaluation();
+        long initialTime=System.currentTimeMillis();
         while(executionTimeLeft(maxExecutionTime, initialTime) && fitnessImproved()) {
-   /*         -Evaluation of fitness of chromosomes, if not already in hasmap
-            -creazione simulazioni;
-            esecuzione in thread diversi, wait sui thread;
-            valutazione results;
-            -Aggiorna bestChromosomes
-                    - HashMap dove mette i fitness associati ai cromosomi
-                    - Creazione generazione successiva:
-            fase di riproduzione
-            crossover e mutation con parametri definiti
-            -elitismo
-            print(results)
-*/
+
+            selectionAndReproduction();
+            crossover();
+            mutation();
+            evaluation();
         }
     }
+    //valuta i chromosome presenti nella lista chromosomes e aggiunge il loro fitness nella map chromosomeFitness
+    //aggiunge un valore ad bestFitnessForGeneration
+    private void evaluation() {
+        List<Chromosome> chromosomesToEvaluate = new ArrayList<>();
+        for(Chromosome chromosome : chromosomes)
+        {
+            if(!chromosomesFitness.containsKey(chromosome))
+            {
+                chromosomesToEvaluate.add(chromosome);
+            }
+        }
+        computeFitness(chromosomesToEvaluate);
+
+        addBestFitness();
+    }
+
+    private void computeFitness(List<Chromosome> chromosomes) {
+        Chromosome[] chromosomesArray = (Chromosome[])chromosomes.toArray();
+        SimulationManager simulationManager = new SimulationManager(chromosomesArray);
+        simulationManager.runSimulations();
+        ChromosomeFitness[] chromosomeFitnesses = simulationManager.getSimulationResults();
+        for(ChromosomeFitness chromosomeFitness: chromosomeFitnesses)
+        {
+            this.chromosomesFitness.put(chromosomeFitness.getChromosome(), chromosomeFitness);
+        }
+    }
+    private void addBestFitness() {
+        double bestFitness = -1;
+        for(Chromosome chromosome : chromosomes)
+        {
+            Double fitness = chromosomesFitness.get(chromosome).getFitness();
+            if(bestFitness<fitness)
+            {
+                bestFitness=fitness;
+            }
+        }
+        bestFitnessForGenerations.add(bestFitness);
+    }
+    //select the chromosomes that will be reproduced and replaces the chromosomes in the array chromosomes
+    //inserisce migliori in bestChromosomes
+    private void selectionAndReproduction() {
+
+    }
+        //accoppia tutti i chromosome in chromosomes non presenti in bestChromosomes e con probabilità pari a CROSSOVER_RATE effettua crossover
+    private void crossover() {
+
+    }
+    //per ogni chromosome non presente in bestChromosomes per ogni gene effettua una mutazione con probabilità MUTATION_RATE
+    private void mutation() {
+
+    }
+
 
     private boolean fitnessImproved() {
         int generations = bestFitnessForGenerations.size();
@@ -60,16 +110,6 @@ public class GeneticOptimizationSimulation {
         return max;
     }
 
-    public double getBestFitness()
-    {
-        double max = -1;
-        for(int i = 0; i<bestChromosomes.size(); i++)
-        {
-            if(max<bestChromosomes.get(i).getFitness())
-                max=bestChromosomes.get(i).getFitness();
-        }
-        return max;
-    }
     private boolean executionTimeLeft(long maxExecutionTime, long initialTime) {
 
         return (initialTime+maxExecutionTime) > System.currentTimeMillis();
@@ -77,22 +117,22 @@ public class GeneticOptimizationSimulation {
 
     private void createChromosomes() {
 
-        for(int i = 0; i< CHROMOSOMES_NUMBER; i++)
+        for(int i = 0; i< POPULATION_SIZE; i++)
         {
             chromosomes.add(GenesFactory.getRandomChromosome());
         }
     }
 
-    public ChromosomeFitness[] getChromosomes()
+    public ChromosomeFitness getBestChromosomeFitness()
     {
-        return (ChromosomeFitness[])chromosomesFitness.toArray();
+        ChromosomeFitness[] chromosomeFitnesses= (ChromosomeFitness[]) bestChromosomes.toArray();
+        Arrays.sort(chromosomeFitnesses);
+        return chromosomeFitnesses[chromosomeFitnesses.length-1];
     }
-
-    public void initializeFromString(String content) {
-    }
-
-    @Override public String toString()
+    private int getEliteSize()
     {
-        return  null;
+        int size = (int)(((double)POPULATION_SIZE)*ELITISM_RATE);
+        if(size<=0) size =1;
+        return size;
     }
 }
