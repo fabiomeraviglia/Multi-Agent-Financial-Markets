@@ -6,10 +6,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class SimulationManager  {
+class SimulationManager  {
 
     private ChromosomeFitness[] results=null;
-    private Chromosome[] chromosomes;
+    private final Chromosome[] chromosomes;
     public SimulationManager(Chromosome[] chromosomes)
     {
         this.chromosomes=chromosomes;
@@ -65,7 +65,7 @@ public class SimulationManager  {
     }
 
 
-    public static SimulationExecutor getSimulationExecutor(Chromosome chromosome)
+    private static SimulationExecutor getSimulationExecutor(Chromosome chromosome)
     {
 
         Simulation simulation = ChromosomeFactory.ConvertToSimulation(chromosome);

@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-public class OptimizationManager {
+class OptimizationManager {
 
-    List<ChromosomeFitness> bestChromosomes = new ArrayList<>();
-    GeneticOptimizationSimulation optimizationSimulation=null;
+    private final List<ChromosomeFitness> bestChromosomes = new ArrayList<>();
+    private GeneticOptimizationSimulation optimizationSimulation=null;
 
 
 

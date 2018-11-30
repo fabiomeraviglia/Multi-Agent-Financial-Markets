@@ -1,6 +1,6 @@
 package GeneticOptimization;
 
-public class DesiredResults extends SimulationResults {
+class DesiredResults extends SimulationResults {
 
     public DesiredResults()
     {

@@ -8,16 +8,16 @@ import java.util.Objects;
 public abstract class Gene<T> implements Cloneable{
     final private String name;
     final private T value;
-    public Gene(String name, T value)
+    Gene(String name, T value)
     {
         this.name=name;
         this.value=value;
     }
-    public final T getValue()
+    final T getValue()
     {
         return value;
     }
-    public final String getName() {return  name; }
+    final String getName() {return  name; }
     public abstract Gene<T> getMutation();
     public abstract Gene<T> getRandomGene();
     @Override
@@ -39,7 +39,7 @@ public abstract class Gene<T> implements Cloneable{
     {
         Class<?> c = configuration.getClass();
 
-        Field parameter = null;
+        Field parameter;
         try {
             parameter = c.getDeclaredField(this.name);
 

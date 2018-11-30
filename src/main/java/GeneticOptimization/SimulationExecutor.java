@@ -4,7 +4,7 @@ import Simulation.Simulation;
 
 public class SimulationExecutor implements Runnable {
 
-    private Simulation simulation;
+    private final Simulation simulation;
 
     public SimulationExecutor(Simulation simulation)
     {

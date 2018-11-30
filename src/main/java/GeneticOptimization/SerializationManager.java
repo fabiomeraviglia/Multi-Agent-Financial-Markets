@@ -2,7 +2,7 @@ package GeneticOptimization;
 
 import java.io.*;
 
-public class SerializationManager {
+class SerializationManager {
     public static void serialize(String fileName, Serializable object)
     {
 

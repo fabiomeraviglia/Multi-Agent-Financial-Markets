@@ -9,17 +9,17 @@ import java.util.*;
 public class GeneticOptimizationSimulation implements Serializable{
 
     private static final long serialVersionUID = 127988556026189305L;
-    Chromosome[] chromosomes; // the cromosomes for the current generation, n = POPULATION_SIZE
-    HashMap<Chromosome,ChromosomeFitness> chromosomesFitness = new HashMap<>();//store the fitness for every chromosome ever computed
-    HashSet<Chromosome> bestChromosomes = new HashSet<>();//the n best chromosomes for the current generation, where n = ELITE_SIZE
-    List<Double> bestFitnessForGenerations = new ArrayList<>();//store the best fitness for every generation; length = number of generations
-    private double MUTATION_RATE=GeneticExperimentHyperparameters.MUTATION_RATE,
-            CROSSOVER_RATE=GeneticExperimentHyperparameters.CROSSOVER_RATE,
-            ELITISM_RATE = GeneticExperimentHyperparameters.ELITISM_RATE;
-    private int POPULATION_SIZE =GeneticExperimentHyperparameters.POPULATION_SIZE
-            , INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS= GeneticExperimentHyperparameters.INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS,
-            ROUNDS_OF_SIMULATION = GeneticExperimentHyperparameters.ROUNDS_OF_SIMULATION;
-    private int ELITE_SIZE = getEliteSize();
+    private Chromosome[] chromosomes; // the cromosomes for the current generation, n = POPULATION_SIZE
+    private final HashMap<Chromosome,ChromosomeFitness> chromosomesFitness = new HashMap<>();//store the fitness for every chromosome ever computed
+    private final HashSet<Chromosome> bestChromosomes = new HashSet<>();//the n best chromosomes for the current generation, where n = ELITE_SIZE
+    private final List<Double> bestFitnessForGenerations = new ArrayList<>();//store the best fitness for every generation; length = number of generations
+    private final double MUTATION_RATE=GeneticExperimentHyperparameters.MUTATION_RATE;
+    private final double CROSSOVER_RATE=GeneticExperimentHyperparameters.CROSSOVER_RATE;
+    private final double ELITISM_RATE = GeneticExperimentHyperparameters.ELITISM_RATE;
+    private final int POPULATION_SIZE =GeneticExperimentHyperparameters.POPULATION_SIZE;
+    private final int INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS= GeneticExperimentHyperparameters.INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS;
+
+    private final int ELITE_SIZE = getEliteSize();
     public GeneticOptimizationSimulation()
     {
         this.createChromosomes();
@@ -131,10 +131,9 @@ public class GeneticOptimizationSimulation implements Serializable{
         //insert selected chromosomes
         for (int i = count; i < n; i++) {
             int index;
-            while (true) {
+            do {
                 index = Main.r.nextInt(n);
-                if (Main.r.nextDouble() < weight[index] / maxWeight) break;
-            }
+            } while (!(Main.r.nextDouble() < weight[index] / maxWeight));
             newChromosomes[i]=chromosomes[index];
         }
 

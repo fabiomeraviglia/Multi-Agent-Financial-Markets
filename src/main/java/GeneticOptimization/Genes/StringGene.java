@@ -3,13 +3,13 @@ package GeneticOptimization.Genes;
 import Main.Main;
 
 public class StringGene extends Gene<String> {
-    String[] range;
+    private final String[] range;
     public StringGene(String name, String[] range)
     {
         super(name, range[0]);
         this.range=range;
     }
-    public StringGene(String name, String value, String[] range)
+    private StringGene(String name, String value, String[] range)
     {
         super(name, value);
         this.range=range;
@@ -23,9 +23,9 @@ public class StringGene extends Gene<String> {
     @Override
     public Gene<String> getRandomGene() {
 
-        String choosen = range[Main.r.nextInt(range.length)];
+        String chosen = range[Main.r.nextInt(range.length)];
 
-        return new StringGene(getName(), choosen, range);
+        return new StringGene(getName(), chosen, range);
     }
 
     @Override

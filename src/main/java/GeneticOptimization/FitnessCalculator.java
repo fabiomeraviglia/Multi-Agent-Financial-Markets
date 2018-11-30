@@ -1,8 +1,8 @@
 package GeneticOptimization;
 
-public class FitnessCalculator {
+class FitnessCalculator {
 
-    public static final SimulationResults desiredResults = new DesiredResults();
+    private static final SimulationResults desiredResults = new DesiredResults();
 
 
     //euclidean distance for fitness calculation

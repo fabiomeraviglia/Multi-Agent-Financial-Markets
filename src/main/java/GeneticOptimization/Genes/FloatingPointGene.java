@@ -2,7 +2,8 @@ package GeneticOptimization.Genes;
 import Main.Main;
 public class FloatingPointGene extends Gene<Double> {
 
-    Double minValue, maxValue;
+    private final Double minValue;
+    private final Double maxValue;
     public FloatingPointGene(String name, Double minValue, Double maxValue)
     {
         super(name,minValue);
@@ -10,7 +11,7 @@ public class FloatingPointGene extends Gene<Double> {
         this.minValue=minValue;
         this.maxValue=maxValue;
     }
-    public FloatingPointGene(String name, Double value, Double minValue, Double maxValue)
+    private FloatingPointGene(String name, Double value, Double minValue, Double maxValue)
     {
         super(name,value);
         if(minValue>maxValue) throw  new IllegalArgumentException();
@@ -22,7 +23,7 @@ public class FloatingPointGene extends Gene<Double> {
     {
 
         if(Main.r.nextDouble()<0.5) {
-            double range = maxValue-minValue;
+
             double distanceFromBorder = Math.min(maxValue-getValue(), getValue()-minValue);
 
             double variation = (Main.r.nextGaussian()*distanceFromBorder)/3;

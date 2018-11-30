@@ -2,7 +2,7 @@ package GeneticOptimization;
 
 import Simulation.Simulation;
 
-public class SimulationResultsCalculator {
+class SimulationResultsCalculator {
     public static SimulationResults calculateResult(Simulation simulation) {
 
         return  new DesiredResults();

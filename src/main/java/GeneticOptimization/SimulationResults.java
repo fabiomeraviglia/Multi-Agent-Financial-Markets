@@ -6,12 +6,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class SimulationResults implements  Iterable<Double>{
-    public double SpreadMean=0;
-    public double SpreadStandardDeviation=0;
-    public double SpreadTails=0;
-    public double LogReturnsMean=0;
-    public double LogReturnsStandardDeviation=0;
-    public double LogReturnsTails=0;
+    double SpreadMean=0;
+    double SpreadStandardDeviation=0;
+    double SpreadTails=0;
+    double LogReturnsMean=0;
+    double LogReturnsStandardDeviation=0;
+    double LogReturnsTails=0;
 
     @NotNull
     @Override

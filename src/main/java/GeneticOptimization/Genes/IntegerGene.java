@@ -4,14 +4,15 @@ import Main.Main;
 
 public class IntegerGene extends Gene<Integer>{
 
-    Integer minValue, maxValue;
+    private final Integer minValue;
+    private final Integer maxValue;
     public IntegerGene(String name, Integer minValue, Integer maxValue)
     {
         super(name,minValue);
         this.minValue= minValue;
         this.maxValue = maxValue;
     }
-    public IntegerGene(String name, Integer value, Integer minValue, Integer maxValue)
+    private IntegerGene(String name, Integer value, Integer minValue, Integer maxValue)
     {
         super(name,value);
         this.minValue= minValue;
@@ -21,7 +22,7 @@ public class IntegerGene extends Gene<Integer>{
     public Gene<Integer> getMutation() {
 
         if(Main.r.nextDouble()<0.5) {
-            Integer range = maxValue-minValue;
+
             Integer distanceFromBorder = Math.min(maxValue-getValue(), getValue()-minValue);
 
             double variation = (Main.r.nextGaussian()*((double)distanceFromBorder))/3;

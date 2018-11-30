@@ -11,7 +11,7 @@ import java.util.*;
 public final class Chromosome implements Serializable, Iterable<Gene> {
 
     private static final long serialVersionUID = -584677331246077114L;
-    private final GenesList genes = new GenesList();
+    private final ArrayList<Gene> genes = new ArrayList<>();
 
     public Chromosome(Collection<Gene> genes)
     {
@@ -50,7 +50,7 @@ public final class Chromosome implements Serializable, Iterable<Gene> {
 
         return getCopyOfGenes().iterator();
     }
-    public List<Gene> getCopyOfGenes()
+    private List<Gene> getCopyOfGenes()
     {
         List<Gene> copy = new ArrayList<>();
         for(Gene gene: genes)
@@ -59,7 +59,7 @@ public final class Chromosome implements Serializable, Iterable<Gene> {
         }
         return copy;
     }
-    public int size() {
+    private int size() {
         return genes.size();
     }
 
@@ -76,7 +76,7 @@ public final class Chromosome implements Serializable, Iterable<Gene> {
     }
 
 
-    public Gene get(int index) {
+    private Gene get(int index) {
         return genes.get(index).clone();
     }
 
@@ -100,9 +100,5 @@ public final class Chromosome implements Serializable, Iterable<Gene> {
         return "Chromosome{" +
                 "genes=" + genes +
                 '}';
-    }
-
-    private class GenesList extends ArrayList<Gene> {
-        private static final long serialVersionUID = 8909203052030285644L;
     }
 }
