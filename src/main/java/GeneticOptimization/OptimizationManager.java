@@ -12,25 +12,21 @@ public class OptimizationManager {
     GeneticOptimizationSimulation optimizationSimulation=null;
 
 
-    private String getFileName(String name)
-    {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-        return name+timeStamp+".txt";
-    }
 
-    public void runOptimization(long maxExecutionTime)
+
+    public void runOptimization(long maxExecutionTimeMillis)
     {
         long initialTime = System.currentTimeMillis();
         if(optimizationSimulation==null) optimizationSimulation = new GeneticOptimizationSimulation();
 
-        while(executionTimeLeft(initialTime, maxExecutionTime)>0) {
+        while(executionTimeLeft(initialTime, maxExecutionTimeMillis)>0) {
 
-            optimizationSimulation.runOptimization(executionTimeLeft(initialTime,maxExecutionTime));
+            optimizationSimulation.runOptimization(executionTimeLeft(initialTime,maxExecutionTimeMillis));
             ChromosomeFitness bestChromosome = optimizationSimulation.getBestChromosomeFitness();
 
             bestChromosomes.add(bestChromosome);
 
-            if(executionTimeLeft(initialTime,maxExecutionTime)>0)
+            if(executionTimeLeft(initialTime,maxExecutionTimeMillis)>0)
             {
                 saveBest();
             }
@@ -42,9 +38,14 @@ public class OptimizationManager {
             optimizationSimulation = new GeneticOptimizationSimulation();
         }
     }
+    public void loadPreviousRun(String fileName)
+    {
 
+        optimizationSimulation = (GeneticOptimizationSimulation)SerializationManager.deserialize(fileName);
+
+    }
     private void saveBest() {
-        String content = "";
+        String content;
         if(bestChromosomes.size()==0) return;
         content=bestChromosomes.get(0).toString();
         for(int i=1;i<bestChromosomes.size();i++)
@@ -55,14 +56,14 @@ public class OptimizationManager {
     }
 
     private void saveConfiguration( GeneticOptimizationSimulation optimizationSimulation) {
-        String content = optimizationSimulation.toString();
 
-        SerializationManager.saveToFile(getFileName("Configuration "),content);
+        SerializationManager.serialize(getFileName("Configuration "),optimizationSimulation);
     }
     private long executionTimeLeft(long initialTime, long maxExecutionTime)
     {
         return maxExecutionTime-(System.currentTimeMillis()-initialTime);
     }
+
     public ChromosomeFitness getBestChromosome()
     {
         if(bestChromosomes.size()==0) return null;
@@ -70,5 +71,10 @@ public class OptimizationManager {
         ChromosomeFitness[] bestChromosomesArray = (ChromosomeFitness[]) bestChromosomes.toArray();
         Arrays.sort(bestChromosomesArray);
         return bestChromosomesArray[bestChromosomesArray.length-1];
+    }
+    private String getFileName(String name)
+    {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+        return name+timeStamp+".txt";
     }
 }

@@ -1,6 +1,5 @@
 package GeneticOptimization;
 
-import Simulation.ExperimentConfiguration;
 import Simulation.Simulation;
 
 import java.util.concurrent.ExecutorService;
@@ -24,8 +23,8 @@ public class SimulationManager  {
 
         ExecutorService executor = Executors.newFixedThreadPool(simulationExecutors.length);
 
-        for (int i = 0; i < simulationExecutors.length; i++) {
-            executor.execute(simulationExecutors[i]);
+        for (SimulationExecutor simulationExecutor : simulationExecutors) {
+            executor.execute(simulationExecutor);
         }
 
         executor.shutdown();
@@ -69,21 +68,10 @@ public class SimulationManager  {
     public static SimulationExecutor getSimulationExecutor(Chromosome chromosome)
     {
 
+        Simulation simulation = ChromosomeFactory.ConvertToSimulation(chromosome);
 
 
-        ExperimentConfiguration configuration = new ExperimentConfiguration();
-
-        //assegna a experimentConfiguration i valori di chromosome
-
-
-        Simulation simulation = new Simulation(configuration);
-
-
-        SimulationExecutor simulationExecutor = new SimulationExecutor(simulation);
-
-
-
-        return  simulationExecutor;
+        return new SimulationExecutor(simulation);
     }
 
 

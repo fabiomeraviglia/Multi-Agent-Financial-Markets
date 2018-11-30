@@ -24,6 +24,8 @@ public class ChromosomeFitness implements Comparable<ChromosomeFitness>, Seriali
     public Double getFitness() {
         return fitness;
     }
+
+
     @Override public  String toString(){
         return chromosome.toString()+";"+fitness;
     }

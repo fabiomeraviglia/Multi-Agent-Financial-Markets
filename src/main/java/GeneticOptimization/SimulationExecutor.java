@@ -18,7 +18,6 @@ public class SimulationExecutor implements Runnable {
     }
     public SimulationResults getResults()
     {
-        SimulationResults results = SimulationResultsCalculator.calculateResult(simulation);
-        return results;
+        return SimulationResultsCalculator.calculateResult(simulation);
     }
 }

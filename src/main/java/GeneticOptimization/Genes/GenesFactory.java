@@ -1,4 +1,4 @@
-package GeneticOptimization;
+package GeneticOptimization.Genes;
 
 public class GenesFactory {
 
@@ -6,7 +6,5 @@ public class GenesFactory {
         return null;
     }
 
-    public static Chromosome getRandomChromosome() {
-        return null;
-    }
+
 }
