@@ -146,8 +146,9 @@ public class Simulation {
         orderBooks.clearTransactions();
         for(Agent agent : agents)
         {
-            List<Action> actions = agent.getActions(marketHistory);
-            for(Action action: actions) action.executeAction(orderBooks);
+          agent.updateKnowledge();
+          agent.updatePlannedActions();
+          agent.popNextAction().executeAction(orderBooks);
         }
         addHistory();
         updateObservables();
@@ -167,7 +168,7 @@ public class Simulation {
         }
         else
         {
-            marketHistory.addBid(0);
+            marketHistory.addBid(configuration.INITIAL_PRICE);
         }
 
         SellOffer ask = orderBooks.getAsk();
@@ -201,11 +202,12 @@ public class Simulation {
         agents= new ArrayList<>();
         for(int i=0;i<numberOfAgents;i++) {
             agents.add(new Agent.Builder()
-                    .context(this)
-                    .predictor(new PricePredictor(configuration.INITIAL_PRICE))
-                    .tactic(configuration.TACTIC)
-                    .assets(new Assets(configuration.INITIAL_CASH, configuration.INITIAL_STOCKS))
-                    .build()
+              .context(this)
+              .knowledge(configuration.KNOWLEDGE)
+              .perception(configuration.PERCEPTION)
+              .tactic(configuration.TACTIC)
+              .assets(new Assets(configuration.INITIAL_CASH, configuration.INITIAL_STOCKS))
+              .build()
             );
         }
 

@@ -29,7 +29,6 @@ public class Main
     {
       System.out.printf("\rRound %6d/%d - Current price:%5d Number of transactions: %7d", i+1, ROUNDS,sim.marketHistory.getCurrentPrice(),sim.orderBooks.getTransactions().size());
       sim.nextTurn();
-
       if (i % ExperimentConfiguration.ROUNDS_TO_PLOT == 0) {
         for(Observable o : PlotManager.watchedObservables)
         {

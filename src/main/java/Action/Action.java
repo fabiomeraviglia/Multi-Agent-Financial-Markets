@@ -12,5 +12,5 @@ public abstract class Action {
     {
         this.owner=owner;
     }
-
+    public Agent getOwner() { return owner; }
 }

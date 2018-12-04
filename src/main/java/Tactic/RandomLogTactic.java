@@ -7,27 +7,38 @@ import Main.Main;
  */
 public class RandomLogTactic extends RandomTactic {
 
-    double variance;
+    public final double v1;
+    public final double v2;
+    public final double limitInSpread;
 
-    /**
-     * @param variance
-     * variance = 1 varianza standard (circa del +-30% rispetto a valore medio
-     * variance = 0 varianza nulla
-     * variance = 0.1 (variazioni di circa 10% rispetto a media)
-     */
-    public RandomLogTactic(double variance)
+    public RandomLogTactic(
+      double limitInSpread, double v1, double v2, double idleChance,
+      double removeBuyOrdersChance, double removeSellOrdersChance,
+      double spotBuyChance, double spotSellChance, double limitBuyChance, double limitSellChance)
     {
-        this.variance = variance;
-    }
-    @Override
-    int chooseSellPrice(Integer predictedPrice) {
-        double p = - Math.log(1 - Main.r.nextDouble()) * variance;
-        return (int)Math.max((predictedPrice)*(1+p), 1);
+        super(-1, idleChance, removeBuyOrdersChance,
+          removeSellOrdersChance, spotBuyChance, spotSellChance,
+          limitBuyChance, limitSellChance);
+        this.v1 = v1;
+        this.v2 = v2;
+        this.limitInSpread = limitInSpread;
     }
 
     @Override
-    int chooseBuyPrice(Integer predictedPrice) {
-        double p = - Math.log(1 - Main.r.nextDouble()) * variance;
-        return (int)Math.max((predictedPrice)/(1+p),1);
+    int chooseSellPrice(Integer bidPrice, Integer askPrice) {
+        double p = - Math.log(1 - Main.r.nextDouble());
+        boolean inSpread = Main.r.nextDouble() < limitInSpread;
+        return (int)(!inSpread
+          ? askPrice * (1 + p * v1)
+          : Math.max(askPrice / (1 + p * v2), bidPrice - 1));
+    }
+
+    @Override
+    int chooseBuyPrice(Integer bidPrice, Integer askPrice) {
+        double p = - Math.log(1 - Main.r.nextDouble());
+        boolean inSpread = Main.r.nextDouble() < limitInSpread;
+        return (int)(!inSpread
+          ? Math.max(bidPrice / (1 + p * v1), 1)
+          : Math.min(Math.max(bidPrice * (1 + p * v2), 1), askPrice + 1));
     }
 }
