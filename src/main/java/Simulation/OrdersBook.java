@@ -4,66 +4,44 @@ import Offer.BuyOffer;
 import Offer.Offer;
 import Offer.SellOffer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.HashSet;
 
-public class OrderBooks {
+public class OrdersBook {
 
-    //spread = bid-ask
-    private  PriorityQueue<BuyOffer> buyOrders;
-    private  PriorityQueue<SellOffer> sellOrders;
-
-    private List<Transaction> transactions  = new ArrayList<>();
-
-    public void clearTransactions() {transactions.clear();}
-
+    private PriorityQueue<BuyOffer> buyOrders;
+    private PriorityQueue<SellOffer> sellOrders;
+    private List<Transaction> transactions;
     private Map<Agent, Set<BuyOffer>> buyers;
     private Map<Agent, Set<SellOffer>> sellers;
+    private int currentBidPrice;
+    private int currentAskPrice;
 
-    public OrderBooks()
+    public void clearTransactions() { transactions.clear();}
+
+    public OrdersBook() { this(1,1); }
+    public OrdersBook(int initialBid, int initialAsk)
     {
-        buyOrders = new PriorityQueue<>(new BuyOffer.AskComparator());
-        sellOrders = new PriorityQueue<>(new SellOffer.BidComparator());
+        buyOrders = new PriorityQueue<>(new BuyOffer.BidComparator());
+        sellOrders = new PriorityQueue<>(new SellOffer.AskComparator());
+        transactions = new ArrayList<>();
         buyers = new HashMap<>();
         sellers = new HashMap<>();
+        this.currentAskPrice = initialAsk;
+        this.currentBidPrice = initialBid;
     }
 
-    public void addBuy(BuyOffer offer)
-    {
-        //SellOffer bestBid = sellOrders.peek();
-        //while(bestBid!=null&&bestBid.getPrice()<=offer.getPrice()&&offer.getStockQuantity()>0)
-        //{
-        //    Integer quantityBought= Math.min(bestBid.getStockQuantity(),offer.getStockQuantity());
-        //    buyOrder(offer.getOwner(),quantityBought*bestBid.getPrice());
-        //    offer.setStockQuantity(offer.getStockQuantity()-quantityBought);
-        //    offer.getOwner().getOfferedAssets().addCash(-quantityBought*offer.getPrice());
-        //    bestBid = sellOrders.peek();
-        //}
-        if (offer.getStockQuantity()>0)
-        {
-            buyOrders.add(offer);
-            if(!buyers.containsKey(offer.getOwner())) { buyers.put(offer.getOwner(), new HashSet<>()); }
-            buyers.get(offer.getOwner()).add(offer);
-        }
-    }
-
-    public void addSell(SellOffer offer)
-    {
-        //BuyOffer bestBuyOffer=buyOrders.peek();
-        //while (bestBuyOffer!=null&&bestBuyOffer.getPrice()>=offer.getPrice()&&offer.getStockQuantity()>0)
-        //{
-        //    Integer soldQuantity=Math.min(bestBuyOffer.getStockQuantity(),offer.getStockQuantity());
-        //    sellOrder(offer.getOwner(),soldQuantity);
-        //    offer.setStockQuantity(offer.getStockQuantity()-soldQuantity);
-        //    offer.getOwner().getOfferedAssets().addStocks(-soldQuantity);
-        //    bestBuyOffer=buyOrders.peek();
-        //}
-        if (offer.getStockQuantity()>0)
-        {
-            sellOrders.add(offer);
-            if(!sellers.containsKey(offer.getOwner())) { sellers.put(offer.getOwner(), new HashSet<>()); }
-            sellers.get(offer.getOwner()).add(offer);
-        }
-    }
+    public int getCurrentBidPrice() { return currentBidPrice; }
+    public int getCurrentAskPrice() { return currentAskPrice; }
+    public List<Transaction> getTransactions() { return transactions; }
+    public Transaction getLastTransactin() { return transactions.get(transactions.size() - 1); }
+    public List<SellOffer> getSellOrders() { return new ArrayList<>(sellOrders); }
+    public List<BuyOffer> getBuyOrders() { return new ArrayList<BuyOffer>(buyOrders); }
 
     public List<BuyOffer> getAgentBuyOffers (Agent a)
     {
@@ -77,125 +55,159 @@ public class OrderBooks {
         return new ArrayList<>(sellers.get(a));
     }
 
-    /***
-     * Rimuove tutte le offerte attive di un agente
-     * @param owner owner delle offerte
-     */
+    public boolean limitBuyOrder(Agent originator, int stockQuantity, int price)
+    {
+        if (stockQuantity <= 0) {
+            throw new RuntimeException("Tried to insert a buy offer with negative or zero stock quantity.");
+        }
+        if (price <= 0) {
+            throw new RuntimeException("Tried to insert a buy offer with negative or zero price.");
+        }
+        if (price >= currentAskPrice) { return false; }
+        if (stockQuantity * price > originator.getFreeAssets().cash) { return false; }
+        BuyOffer o = new BuyOffer(originator, stockQuantity, price);
+        buyOrders.add(o);
+        if(price > currentBidPrice || buyOrders.size() == 1) { currentBidPrice = price; }
+        if(!buyers.containsKey(originator)) { buyers.put(originator, new HashSet<>()); }
+        buyers.get(originator).add(o);
+        return true;
+    }
+
+    public boolean limitSellOrder(Agent originator, int stockQuantity, int price)
+    {
+        if (stockQuantity <= 0) {
+            throw new RuntimeException("Tried to insert a buy offer with negative or zero stock quantity.");
+        }
+        if (price <= 0) {
+            throw new RuntimeException("Tried to insert a buy offer with negative or zero price.");
+        }
+        if (price <= currentBidPrice) { return false; }
+        if (stockQuantity > originator.getFreeAssets().stocks) { return false; }
+        SellOffer o = new SellOffer(originator, stockQuantity, price);
+        sellOrders.add(o);
+        if(price < currentAskPrice || sellOrders.size() == 1) { currentAskPrice = price; }
+        if(!sellers.containsKey(originator)) { sellers.put(originator, new HashSet<>()); }
+        sellers.get(originator).add(o);
+        return true;
+    }
+
+    public boolean spotBuyOrder(Agent originator, int offeredCash)
+    {
+        if (offeredCash <= 0) {
+            throw new RuntimeException("Tried to spot buy stocks for a negative or zero number of cash");
+        }
+        if (offeredCash < currentAskPrice) { return false; }
+        int availableCash = offeredCash;
+        while (availableCash > currentAskPrice)
+        {
+            SellOffer bestO = sellOrders.peek();
+            if (bestO == null) { break; }
+            int bestOStockQuantity = bestO.getStockQuantity();
+            if (bestOStockQuantity * bestO.price <= availableCash) {
+                if (bestO.accept(originator, bestOStockQuantity)) {
+                    transactions.add(new Transaction(
+                        originator, bestO.owner,
+                        bestOStockQuantity * bestO.price, bestOStockQuantity, bestO.price));
+                    availableCash -= bestOStockQuantity * bestO.price;
+                    sellOrders.remove();
+                    SellOffer nextSellOffer = sellOrders.peek();
+                    if (nextSellOffer == null) { break; /* currentAskPrice remains unchanged */ }
+                    currentAskPrice = nextSellOffer.price;
+                }
+                else { throw new RuntimeException("Refused supposedly sane offer."); }
+            }
+            else {
+                int purchasableStocks = availableCash / bestO.price;
+                if(bestO.accept(originator, purchasableStocks))
+                {
+                    transactions.add(new Transaction(
+                        originator, bestO.owner,
+                        purchasableStocks * bestO.price, purchasableStocks, bestO.price));
+                    availableCash -= purchasableStocks * bestO.price;
+                }
+                else { throw new RuntimeException("Refused supposedly sane offer."); }
+            }
+        }
+        if (availableCash == offeredCash) { return false; }
+        return true;
+    }
+
+    public boolean spotSellOrder(Agent originator, int offeredStocks)
+    {
+        if (offeredStocks <= 0) {
+            throw new RuntimeException("Tried to spot sell a negative or zero number of stocks.");
+        }
+        int availableStocks = offeredStocks;
+        while (availableStocks > 0)
+        {
+            BuyOffer bestO = buyOrders.peek();
+            if (bestO == null) { break; }
+            int bestOStockQuantity = bestO.getStockQuantity();
+            if (bestOStockQuantity < availableStocks) {
+                if (bestO.accept(originator, bestOStockQuantity)) {
+                    transactions.add(new Transaction(
+                        bestO.owner, originator,
+                        bestOStockQuantity * bestO.price, bestOStockQuantity, bestO.price));
+                    availableStocks -= bestOStockQuantity;
+                    buyOrders.remove();
+                    BuyOffer nextBuyOffer = buyOrders.peek();
+                    if (nextBuyOffer == null) { break; /* currentAskPrice remains unchanged */ }
+                    currentBidPrice = nextBuyOffer.price;
+                }
+                else { throw new RuntimeException("Refused supposedly sane offer."); }
+            }
+            else {
+                if(bestO.accept(originator, availableStocks))
+                {
+                    transactions.add(new Transaction(
+                        bestO.owner, originator,
+                        availableStocks * bestO.price, availableStocks, bestO.price));
+                    availableStocks = 0;
+                }
+                else { throw new RuntimeException("Refused supposedly sane offer."); }
+            }
+        }
+        if (availableStocks == offeredStocks) { return false; }
+        return true;
+    }
+
     public void removeAllOffers(Agent owner)
     {
         removeAllBuyOrders(owner);
         removeAllSellOrders(owner);
     }
+
     public void removeBuyOrders(List<BuyOffer> toBeRemoved)
     {
         for(BuyOffer o : toBeRemoved) {
             buyOrders.remove(o);
-            buyers.get(o.getOwner()).remove(o);
+            if (buyOrders.peek() != null) { currentBidPrice = buyOrders.peek().price; }
+            buyers.get(o.owner).remove(o);
             o.cancel();
         }
     }
+
     public void removeSellOrders(List<SellOffer> toBeRemoved)
     {
         for(SellOffer o : toBeRemoved) {
             sellOrders.remove(o);
-            sellers.get(o.getOwner()).remove(o);
+            if (sellOrders.peek() != null) { currentAskPrice = sellOrders.peek().price; }
+            sellers.get(o.owner).remove(o);
             o.cancel();
         }
     }
+
     public void removeAllBuyOrders(Agent owner)
     {
-        if (buyers.containsKey(owner)) { removeBuyOrders(new ArrayList<>(buyers.get(owner))); }
+        if (buyers.containsKey(owner)) {
+            removeBuyOrders(new ArrayList<>(buyers.get(owner)));
+        }
     }
+
     public void removeAllSellOrders(Agent owner)
     {
-        if (sellers.containsKey(owner)) { removeSellOrders(new ArrayList<>(sellers.get(owner))); }
-    }
-    public SellOffer getAsk()
-    {
-        return sellOrders.peek();
-    }
-    public BuyOffer getBid()
-    {
-        return buyOrders.peek();
-    }
-
-    public void buyOrder(Agent buyer, Integer cash)
-    {
-        boolean canBuy=true;
-        while(canBuy)
-        {
-            Offer bestOffer = sellOrders.peek();
-            if(bestOffer==null) return;
-            Integer cost = bestOffer.getCost();
-            Integer price = bestOffer.getPrice();
-            Agent seller = bestOffer.getOwner();
-            Integer transactionQuantity;
-            if(cost<=cash)
-            {//se questa offerta viene completamente soddisfatta, la rimuovo
-                transactionQuantity = bestOffer.getStockQuantity();
-                sellOrders.poll();//rimuovo offerta
-                sellers.get(bestOffer.getOwner()).remove(bestOffer);
-            }
-            else
-            {
-                transactionQuantity=cash/price;
-                canBuy=false;
-            }
-            bestOffer.accept(buyer,transactionQuantity);
-            transactions.add(new Transaction(buyer,seller,transactionQuantity*price,transactionQuantity, price));
-            cash=cash-transactionQuantity*price;
+        if (sellers.containsKey(owner)) {
+            removeSellOrders(new ArrayList<>(sellers.get(owner)));
         }
-    }
-    /**
-     * Effettua una transazione di stock e cash, partendo dal miglior offerente
-     * nel caso l'offerta sia di ask, client vende stock, se offerta è offerBid, client compra gli stock
-     * nel caso la richiesta di quantity non sia soddisfatta dalla prima offerta, si passa al secondo miglior offerente e così via
-     * le offerte soddisfatte presenti in orders vengono eliminate dalla coda
-     * @param seller cliente che richiede di effettuare la transazione
-     * @param quantity quantita di stock venduti o comprati dal cliente
-     */
-    public void sellOrder(Agent seller, Integer quantity)
-    {
-        while(quantity>0)
-        {
-            Offer bestOffer = buyOrders.peek();
-            if(bestOffer==null) return;
-
-            Integer offerQuantity= bestOffer.getStockQuantity();
-            Agent buyer = bestOffer.getOwner();
-
-            Integer transactionQuantity;
-            if(offerQuantity<=quantity)
-            {//se questa offerta viene completamente soddisfatta, la rimuovo
-                transactionQuantity=offerQuantity;
-                buyOrders.poll();//rimuovo offerta
-                buyers.get(bestOffer.getOwner()).remove(bestOffer);
-            }
-            else
-            {
-                transactionQuantity=quantity;
-            }
-
-            bestOffer.accept(seller,transactionQuantity);
-
-            transactions.add(new Transaction(buyer,seller,transactionQuantity*bestOffer.getPrice(),transactionQuantity, bestOffer.getPrice()));
-            quantity=quantity-transactionQuantity;
-
-        }
-    }
-
-    public List<SellOffer> getSellOrders()
-    {
-        return new ArrayList<>(sellOrders);
-    }
-
-    public List<BuyOffer> getBuyOrders()
-    {
-        return new ArrayList<>(buyOrders);
-    }
-
-    public List<Transaction> getTransactions()
-    {
-        return transactions;
     }
 }

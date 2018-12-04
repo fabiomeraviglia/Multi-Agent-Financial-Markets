@@ -1,6 +1,5 @@
 package Simulation;
 
-import Action.Action;
 import Gui.Observable;
 import Offer.BuyOffer;
 import Offer.SellOffer;
@@ -9,127 +8,66 @@ import javafx.util.Pair;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-public class Simulation {
-    private Map<Gui.Observable, List<Pair<Integer, Double>>> observables;
-    private Map<Gui.Observable, Consumer<List<Pair<Integer, Double>>>> observablesUpdateFunctions;
 
-    public List<Agent> agents;
-    public MarketHistory marketHistory;
-    public OrderBooks orderBooks;
-    public Integer turn, numberOfAgents;
-    ExperimentConfiguration configuration;
-    public Simulation(ExperimentConfiguration configuration)
+public class Simulation {
+
+    private Map<Observable, List<Pair<Integer, Double>>> observables;
+    private List<Agent> agents;
+    private OrdersBook ordersBook;
+    private Integer turn;
+
+    public final Configuration configuration;
+
+    private final Map<Observable, Consumer<List<Pair<Integer, Double>>>> observablesUpdateFunctions;
+
+    public Simulation(Configuration configuration)
     {
-        this.configuration=configuration;
-        this.numberOfAgents = configuration.NUMBER_OF_AGENTS;
+        this.configuration = configuration;
+        Map<Observable, Consumer<List<Pair<Integer, Double>>>> tmpFunctionMap = new HashMap<>();
+        tmpFunctionMap.put(Observable.ASK_PRICE_HISTORY, this::updateAskPriceHistory);
+        tmpFunctionMap.put(Observable.BID_PRICE_HISTORY, this::updateBidPriceHistory);
+        tmpFunctionMap.put(Observable.MARKET_DEPTH, this::updateMarketDepth);
+        tmpFunctionMap.put(Observable.LOG_SPREAD, this::updateLogSpread);
+        tmpFunctionMap.put(Observable.LOG_RETURNS, this::updateLogReturns);
+        this.observablesUpdateFunctions = Collections.unmodifiableMap(tmpFunctionMap);
         initialize();
+    }
+
+    public Map<Observable, List<Pair<Integer, Double>>> getObservables() { return observables; }
+    public OrdersBook getOrdersBook() { return ordersBook; }
+
+    public void nextTurn()
+    {
+        Collections.shuffle(agents);
+        ordersBook.clearTransactions();
+        int agent_count = 0;
+        for(Agent agent : agents)
+        {
+            agent_count++;
+            agent.updateKnowledge(this);
+            agent.updatePlannedActions();
+            agent.popNextAction().executeAction(this);
+        }
+        updateObservables();
+        turn++;
     }
 
     private void initialize()
     {
         turn = 0;
-        createAgents();
-        marketHistory = new MarketHistory(configuration.INITIAL_PRICE);
-        orderBooks = new OrderBooks();
-
-        initializeObservables();
-    }
-
-    private void initializeObservables()
-    {
-        observables = new HashMap<>();
+        this.ordersBook = new OrdersBook(configuration.INITIAL_PRICE, configuration.INITIAL_PRICE);
+        this.observables = new HashMap<>();
         for(Gui.Observable o : Gui.Observable.values()) { observables.put(o, new ArrayList<>()); }
-
-        // Observables' UpdateFunctions implementations:
-        observablesUpdateFunctions = new HashMap<>();
-
-        observablesUpdateFunctions.put(Gui.Observable.BID_PRICE_HISTORY,
-          (List<Pair<Integer, Double>> s) -> {
-              int lastTime = s.size() == 0 ? 0 : s.get(s.size() - 1).getKey();
-              if (orderBooks.getBuyOrders().size() == 0) {
-                  s.add(new Pair<>(lastTime + 1, 0.0));
-              } else {
-                  s.add(new Pair<>(lastTime + 1, (double)orderBooks.getBid().getPrice()));
-              }
-          });
-
-        observablesUpdateFunctions.put(Gui.Observable.ASK_PRICE_HISTORY,
-          (List<Pair<Integer, Double>> s) -> {
-              int lastTime = s.size() == 0 ? 0 : s.get(s.size() - 1).getKey();
-              if (orderBooks.getSellOrders().size() == 0) {
-                  s.add(new Pair<>(lastTime + 1, 0.0));
-              } else {
-                  s.add(new Pair<>(lastTime + 1, (double)orderBooks.getAsk().getPrice()));
-              }
-          });
-
-        observablesUpdateFunctions.put(Gui.Observable.MARKET_DEPTH,
-          (List<Pair<Integer, Double>> s) -> {
-              s.clear();
-              List<BuyOffer> bo = orderBooks.getBuyOrders().stream()
-                .sorted(Comparator.comparing(BuyOffer::getPrice).reversed())
-                .collect(Collectors.toList());
-              List<SellOffer> so = orderBooks.getSellOrders().stream()
-                .sorted(Comparator.comparing(SellOffer::getPrice))
-                .collect(Collectors.toList());
-              int cumBuy = 0, lastBuyPrice = -1;
-              for(BuyOffer offer : bo)
-              {
-                  cumBuy += offer.getStockQuantity();
-                  if (offer.getPrice() == lastBuyPrice)
-                  {
-                      s.remove(s.size() - 1);
-                      s.add(new Pair<>(offer.getPrice(), (double)cumBuy));
-                  }
-                  else
-                  {
-                      s.add(new Pair<>(offer.getPrice(), (double)cumBuy));
-                  }
-                  lastBuyPrice = offer.getPrice();
-              }
-              int cumSell = 0, lastSellPrice = -1;
-              for(SellOffer offer : so)
-              {
-                  cumSell += offer.getStockQuantity();
-                  if (offer.getPrice() == lastSellPrice)
-                  {
-                      s.remove(s.size() - 1);
-                      s.add(new Pair<>(offer.getPrice(), (double)cumSell));
-                  }
-                  else
-                  {
-                      s.add(new Pair<>(offer.getPrice(), (double)cumSell));
-                  }
-                  lastSellPrice = offer.getPrice();
-              }
-          });
-
-        observablesUpdateFunctions.put(Gui.Observable.LOG_RETURNS,
-          (List<Pair<Integer, Double>> s) -> {
-              int lastTime = s.size() == 0 ? 0 : s.get(s.size() - 1).getKey();
-              int lastOrderIdx = marketHistory.askSize() - 1;
-              double last_mid_price = (marketHistory.askSize() > 1 && marketHistory.bidSize() > 1)
-                ? 0.5 * (
-                    Math.log(marketHistory.getAsk(lastOrderIdx - 1))
-                  + Math.log(marketHistory.getBid(lastOrderIdx - 1)))
-                : 0.0;
-              double mid_price = (marketHistory.askSize() > 0 && marketHistory.bidSize() > 0)
-                ? 0.5 * (
-                    Math.log(marketHistory.getAsk(lastOrderIdx))
-                  + Math.log(marketHistory.getBid(lastOrderIdx)))
-                : 0.0;
-              s.add(new Pair<>(lastTime + 1, mid_price - last_mid_price));
-          });
-
-        observablesUpdateFunctions.put(Gui.Observable.LOG_SPREAD,
-          (List<Pair<Integer, Double>> s) -> {
-              int lastTime = s.size() == 0 ? 0 : s.get(s.size() - 1).getKey();
-              int lastOrderIdx = marketHistory.askSize() - 1;
-              double log_spread = (marketHistory.askSize() > 0 && marketHistory.bidSize() > 0)
-                ? Math.log(marketHistory.getAsk(lastOrderIdx)) - Math.log(marketHistory.getBid(lastOrderIdx))
-                : 0.0;
-              s.add(new Pair<>(lastTime + 1, log_spread));
-          });
+        // Agents MUST be the last thing to be initialized because they need to observe the rest of the environment
+        // to generate their first knowledge.
+        this.agents = new ArrayList<>();
+        for(int i = 0; i < this.configuration.NUMBER_OF_AGENTS; i++) {
+            this.agents.add(new Agent.Builder(this)
+                .perception(configuration.PERCEPTION)
+                .tactic(configuration.TACTIC)
+                .assets(new Assets(configuration.INITIAL_CASH, configuration.INITIAL_STOCKS))
+                .build());
+        }
     }
 
     private void updateObservables()
@@ -140,78 +78,101 @@ public class Simulation {
         }
     }
 
-    public void nextTurn()
+    private void updateBidPriceHistory(List<Pair<Integer, Double>> s)
     {
-        Collections.shuffle(agents);
-        orderBooks.clearTransactions();
-        for(Agent agent : agents)
-        {
-          agent.updateKnowledge();
-          agent.updatePlannedActions();
-          agent.popNextAction().executeAction(orderBooks);
+        int lastTime = s.size() == 0 ? 0 : s.get(s.size() - 1).getKey();
+        if (ordersBook.getBuyOrders().size() == 0) {
+            s.add(new Pair<>(lastTime + 1, 0.0));
+        } else {
+            s.add(new Pair<>(lastTime + 1, (double)ordersBook.getCurrentBidPrice()));
         }
-        addHistory();
-        updateObservables();
-        turn++;
     }
 
-    private void addHistory()
+    private void updateAskPriceHistory(List<Pair<Integer, Double>> s)
     {
-        BuyOffer bid = orderBooks.getBid();
-        if (bid != null)
-        {
-            marketHistory.addBid(bid.getPrice());
+        int lastTime = s.size() == 0 ? 0 : s.get(s.size() - 1).getKey();
+        if (ordersBook.getSellOrders().size() == 0) {
+            s.add(new Pair<>(lastTime + 1, 0.0));
+        } else {
+            s.add(new Pair<>(lastTime + 1, (double)ordersBook.getCurrentAskPrice()));
         }
-        else if (marketHistory.bidSize() > 0)
-        {
-            marketHistory.addBid(marketHistory.getBid(marketHistory.bidSize() - 1));
-        }
-        else
-        {
-            marketHistory.addBid(configuration.INITIAL_PRICE);
-        }
-
-        SellOffer ask = orderBooks.getAsk();
-        if (ask!=null)
-        {
-            marketHistory.addAsk(ask.getPrice());
-        }
-        else if (marketHistory.askSize() > 0)
-        {
-            marketHistory.addAsk(marketHistory.getAsk(marketHistory.askSize() - 1));
-        }
-        else
-        {
-            marketHistory.addAsk(configuration.INITIAL_PRICE);
-        }
-
-        List<Transaction> transactions = orderBooks.getTransactions();
-        if(!transactions.isEmpty())
-        {
-            marketHistory.addCurrentPrice(transactions.get(transactions.size() - 1).stockPrice);
-        }
-
-    }
-    /**
-     * Dovrebbe restituire una lista di agenti già configurati, si potrà fare lettura da file
-     * Gli agenti ( o quantomeno le intelligenze) dovrebbero essere addestrate a parte
-     */
-    private void createAgents()
-    {
-
-        agents= new ArrayList<>();
-        for(int i=0;i<numberOfAgents;i++) {
-            agents.add(new Agent.Builder()
-              .context(this)
-              .knowledge(configuration.KNOWLEDGE)
-              .perception(configuration.PERCEPTION)
-              .tactic(configuration.TACTIC)
-              .assets(new Assets(configuration.INITIAL_CASH, configuration.INITIAL_STOCKS))
-              .build()
-            );
-        }
-
     }
 
-    public final Map<Observable, List<Pair<Integer, Double>>> getObservables() { return observables; }
+    private void updateMarketDepth(List<Pair<Integer, Double>> s)
+    {
+        s.clear();
+        List<BuyOffer> bo = ordersBook.getBuyOrders().stream()
+            .sorted(Comparator.comparing((BuyOffer x) -> x.price).reversed())
+            .collect(Collectors.toList());
+        List<SellOffer> so = ordersBook.getSellOrders().stream()
+            .sorted(Comparator.comparing((SellOffer x) -> x.price))
+            .collect(Collectors.toList());
+        int cumBuy = 0, lastBuyPrice = -1;
+        for(BuyOffer offer : bo)
+        {
+            cumBuy += offer.getStockQuantity();
+            if (offer.price == lastBuyPrice)
+            {
+                s.remove(s.size() - 1);
+                s.add(new Pair<>(offer.price, (double)cumBuy));
+            }
+            else
+            {
+                s.add(new Pair<>(offer.price, (double)cumBuy));
+            }
+            lastBuyPrice = offer.price;
+        }
+        int cumSell = 0, lastSellPrice = -1;
+        for(SellOffer offer : so)
+        {
+            cumSell += offer.getStockQuantity();
+            if (offer.price == lastSellPrice)
+            {
+                s.remove(s.size() - 1);
+                s.add(new Pair<>(offer.price, (double)cumSell));
+            }
+            else
+            {
+                s.add(new Pair<>(offer.price, (double)cumSell));
+            }
+            lastSellPrice = offer.price;
+        }
+    }
+
+    private void updateLogReturns(List<Pair<Integer, Double>> s)
+    {
+        int lastTime = s.size() == 0 ? 0 : s.get(s.size() - 1).getKey();
+        List<Pair<Integer, Double>> askHistory = observables.get(Observable.ASK_PRICE_HISTORY);
+        List<Pair<Integer, Double>> bidHistory = observables.get(Observable.BID_PRICE_HISTORY);
+        double lastAskPrice = askHistory.size() > 0
+            ? askHistory.get(askHistory.size() - 1).getValue()
+            : configuration.INITIAL_PRICE;
+        double lastBidPrice = bidHistory.size() > 0 ?
+            bidHistory.get(bidHistory.size() - 1).getValue()
+            : configuration.INITIAL_PRICE;
+        double secondLastAskPrice = askHistory.size() > 1
+            ? askHistory.get(askHistory.size() - 2).getValue()
+            : configuration.INITIAL_PRICE;
+        double secondLastBidPrice = bidHistory.size() > 1
+            ? bidHistory.get(bidHistory.size() - 2).getValue()
+            : configuration.INITIAL_PRICE;
+        double secondLastMidPrice = 0.5 * (Math.log(secondLastAskPrice) + Math.log(secondLastBidPrice));
+        double lastMidPrice = 0.5 * (Math.log(lastAskPrice) + Math.log(lastBidPrice));
+        s.add(new Pair<>(lastTime + 1, lastMidPrice - secondLastMidPrice));
+    }
+
+    private void updateLogSpread(List<Pair<Integer, Double>> s)
+    {
+        int lastTime = s.size() == 0 ? 0 : s.get(s.size() - 1).getKey();
+        List<Pair<Integer, Double>> askHistory = observables.get(Observable.ASK_PRICE_HISTORY);
+        List<Pair<Integer, Double>> bidHistory = observables.get(Observable.BID_PRICE_HISTORY);
+        double lastAskPrice = askHistory.size() > 0
+            ? askHistory.get(askHistory.size() - 1).getValue()
+            : configuration.INITIAL_PRICE;
+        double lastBidPrice = bidHistory.size() > 0 ?
+            bidHistory.get(bidHistory.size() - 1).getValue()
+            : configuration.INITIAL_PRICE;
+        double logSpread = Math.log(lastAskPrice) - Math.log(lastBidPrice);
+        s.add(new Pair<>(lastTime + 1, logSpread));
+    }
 }

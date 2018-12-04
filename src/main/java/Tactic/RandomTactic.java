@@ -1,137 +1,125 @@
 package Tactic;
 
-import Action.*;
+import Action.Action;
+import Action.NullAction;
 import Knowledge.Knowledge;
+import Knowledge.InstantaneousKnowledge;
+import Action.LimitBuyAction;
+import Action.LimitSellAction;
+import Action.SpotSellAction;
+import Action.SpotBuyAction;
+import Action.CancelLimitBuyOrdersAction;
+import Action.CancelLimitSellOrdersAction;
 import Main.Main;
 import Offer.BuyOffer;
 import Offer.SellOffer;
-import Simulation.Agent;
-import Simulation.Assets;
-import Knowledge.CurrentPricesKnowledge;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Random;
 
 public class RandomTactic extends Tactic
 {
-    protected double variance;
-    protected double removeBuyOrdersChance;
-    protected double removeSellOrdersChance;
-    protected double spotBuyChance;
-    protected double spotSellChance;
-    protected double limitBuyChance;
-    protected double limitSellChance;
-    protected double idleChance;
+    private static final Random r = Main.r;
+    public final double variance;
+    public final ActionChances actionChances;
 
-    public RandomTactic(
-      double variance, double idleChance, double removeBuyOrdersChance, double removeSellOrdersChance,
-      double spotBuyChance, double spotSellChance, double limitBuyChance, double limitSellChance)
+    public RandomTactic(double variance, ActionChances actionChances)
     {
         this.variance = variance;
-        double sum = idleChance
-          + removeBuyOrdersChance + removeSellOrdersChance
-          + spotBuyChance + spotSellChance + limitBuyChance
-          + limitSellChance;
-        this.idleChance = idleChance/sum;
-        this.removeBuyOrdersChance = removeBuyOrdersChance/sum;
-        this.removeSellOrdersChance = removeSellOrdersChance/sum;
-        this.spotBuyChance = spotBuyChance/sum;
-        this.spotSellChance = spotSellChance/sum;
-        this.limitBuyChance = limitBuyChance/sum;
-        this.limitSellChance = limitSellChance/sum;
+        this.actionChances = actionChances;
     }
 
     @Override
-    public void decide(Knowledge knowledge, Queue<Action> plannedActionsToUpdate, Agent decisioMaker)
+    public void decide(Knowledge knowledge, Queue<Action> plannedActionsToUpdate)
     {
-        int askPrice = ((CurrentPricesKnowledge)knowledge).askPrice;
-        int bidPrice = ((CurrentPricesKnowledge)knowledge).bidPrice;
-        List<BuyOffer> buyOffers = ((CurrentPricesKnowledge)knowledge).activeBuyOffers;
-        List<SellOffer> sellOffers = ((CurrentPricesKnowledge)knowledge).activeSellOffers;
-        Assets assets = ((CurrentPricesKnowledge)knowledge).freeAssets;
-
-        Random r = Main.r;
-        double outcome = r.nextDouble();
+        InstantaneousKnowledge kn = (InstantaneousKnowledge)knowledge;
+        double rand = r.nextDouble();
         double cumChance = 0.0;
-        Action randomAction;
-        if (outcome < (cumChance += removeBuyOrdersChance))
-        {
-            if (buyOffers.size() < 1)
-            {
-                randomAction = new NullAction();
-                randomAction.setOwner(decisioMaker);
-            }
-            else
-            {
-                int buyOffersToRemoveNum = r.nextInt(buyOffers.size());
-                Collections.shuffle(buyOffers);
-                List<BuyOffer> buyOffersToRemove = buyOffers.subList(0, buyOffersToRemoveNum);
-                randomAction = new RemoveBuyOrdersAction();
-                randomAction.setOwner(decisioMaker);
-                ((RemoveBuyOrdersAction) randomAction).setOrdersToRemove(buyOffersToRemove);
-            }
-        }
-        else if (outcome < (cumChance += removeSellOrdersChance))
-        {
-            if (sellOffers.size() < 1)
-            {
-                randomAction = new NullAction();
-                randomAction.setOwner(decisioMaker);
-            }
-            else
-            {
-                int sellOffersToRemoveNum = r.nextInt(sellOffers.size());
-                Collections.shuffle(sellOffers);
-                List<SellOffer> sellOffersToRemove = sellOffers.subList(0, sellOffersToRemoveNum);
-                randomAction = new RemoveSellOrdersAction();
-                randomAction.setOwner(decisioMaker);
-                ((RemoveSellOrdersAction) randomAction).setOrdersToRemove(sellOffersToRemove);
-            }
-        }
-        else if (outcome < (cumChance += spotBuyChance))
-        {
-            randomAction = new BuyNowAction(r.nextInt(assets.getCash()+1));
-            randomAction.setOwner(decisioMaker);
-        }
-        else if (outcome < (cumChance += spotSellChance))
-        {
-            randomAction = new SellNowAction(r.nextInt(assets.getStocks()+1));
-            randomAction.setOwner(decisioMaker);
-        }
-        else if (outcome < (cumChance += limitBuyChance))
-        {
-            int price = chooseBuyPrice(bidPrice, askPrice);
-            BuyOffer bo = new BuyOffer(r.nextInt(assets.getCash()/price+1), price);
-            randomAction = new BuyAction(bo);
-            randomAction.setOwner(decisioMaker);
-        }
-        else if (outcome < (cumChance += limitSellChance))
-        {
-            SellOffer so = new SellOffer(r.nextInt(assets.getStocks()+1), chooseSellPrice(bidPrice, askPrice));
-            randomAction = new SellAction(so);
-            randomAction.setOwner(decisioMaker);
-        }
-        else
-        {
-            randomAction = new NullAction();
-            randomAction.setOwner(decisioMaker);
-        }
-
+        Action choosedAction =
+            rand < (cumChance += actionChances.limitBuy) ? (generateRandomLimitBuyAction(kn)) :
+                (rand < (cumChance += actionChances.limitSell) ? (generateRandomLimitSellAction(kn)) :
+                    (rand < (cumChance += actionChances.spotBuy) ? (generateRandomSpotBuyAction(kn)) :
+                        (rand < (cumChance += actionChances.spotSell) ? (generateRandomSpotSellAction(kn)) :
+                            (rand < (cumChance += actionChances.removeBuyOrders) ? (generateRandomRemoveBuyOrdersAction(kn)) :
+                                (rand < (cumChance += actionChances.removeSellOrders) ? (generateRandomRemoveSellOrdersAction(kn))
+                                    : (new NullAction(kn.self)))))));
         plannedActionsToUpdate.clear();
-        plannedActionsToUpdate.add(randomAction);
+        plannedActionsToUpdate.add(choosedAction);
     }
 
-    int chooseSellPrice(Integer bid, Integer ask)
+    private int generateRandomBuyPrice(int ask, int bid)
     {
-        int v = (int)variance;
-        int rand = ask + Main.r.nextInt(v*2+1)-v;
-        return Math.max(rand,bid+1);
+        return Math.max(r.nextInt(Math.max(ask, 1)), 1);
     }
 
-    int chooseBuyPrice(Integer bid, Integer ask)
+    private int generateRandomSellPrice(int ask, int bid)
     {
-        int v = (int)variance;
-        int rand = bid + Main.r.nextInt(v*2+1)-v;
-        return Math.max(Math.min(rand, ask-1),1);
+        return Math.max(r.nextInt(Math.max(10*bid - bid, 1)) + bid, 1);
+    }
+
+    private Action generateRandomLimitBuyAction(InstantaneousKnowledge knowledge) {
+        int price = generateRandomBuyPrice(knowledge.askPrice, knowledge.bidPrice);
+        if (price > knowledge.freeAssets.cash) { return new NullAction(knowledge.self); }
+        int stocks = r.nextInt(knowledge.freeAssets.cash / price) + 1;
+        return new LimitBuyAction(knowledge.self, stocks, price);
+    }
+
+    private Action generateRandomLimitSellAction(InstantaneousKnowledge knowledge) {
+        int price = generateRandomSellPrice(knowledge.askPrice, knowledge.bidPrice);
+        if (knowledge.freeAssets.stocks < 1) { return new NullAction(knowledge.self); }
+        int stocks = r.nextInt(knowledge.freeAssets.stocks) + 1;
+        return new LimitSellAction(knowledge.self, stocks, price);
+    }
+
+    private Action generateRandomSpotBuyAction(InstantaneousKnowledge knowledge) {
+        if (knowledge.askPrice > knowledge.freeAssets.cash) { return new NullAction(knowledge.self); }
+        int cash = r.nextInt(knowledge.freeAssets.cash - knowledge.askPrice + 1) + knowledge.askPrice;
+        return new SpotBuyAction(knowledge.self, cash);
+    }
+
+    private Action generateRandomSpotSellAction(InstantaneousKnowledge knowledge) {
+        if (knowledge.freeAssets.stocks < 1) { return new NullAction(knowledge.self); }
+        int stocks = r.nextInt(knowledge.freeAssets.stocks) + 1;
+        return new SpotSellAction(knowledge.self, stocks);
+    }
+
+    private Action generateRandomRemoveBuyOrdersAction(InstantaneousKnowledge knowledge) {
+        List<BuyOffer> toRemove = new ArrayList<>();
+        for (BuyOffer o : knowledge.buyOffers) {  if (r.nextDouble() < 0.5) toRemove.add(o); }
+        if (toRemove.size() < 1) { return new NullAction(knowledge.self); }
+        return new CancelLimitBuyOrdersAction(knowledge.self, toRemove);
+    }
+
+    private Action generateRandomRemoveSellOrdersAction(InstantaneousKnowledge knowledge) {
+        List<SellOffer> toRemove = new ArrayList<>();
+        for (SellOffer o : knowledge.sellOffers) {  if (r.nextDouble() < 0.5) toRemove.add(o); }
+        if (toRemove.size() < 1) { return new NullAction(knowledge.self); }
+        return new CancelLimitSellOrdersAction(knowledge.self, toRemove);
+    }
+
+    public static class ActionChances
+    {
+        public final double removeBuyOrders;
+        public final double removeSellOrders;
+        public final double spotBuy;
+        public final double spotSell;
+        public final double limitBuy;
+        public final double limitSell;
+        public final double idle;
+
+        public ActionChances(
+            double removeBuyOrders, double removeSellOrders, double spotBuy, double spotSell,
+            double limitBuy, double limitSell, double idle) {
+            double sum = removeBuyOrders + removeSellOrders + spotBuy + spotSell + limitBuy + limitSell + idle;
+            this.removeBuyOrders = removeBuyOrders/sum;
+            this.removeSellOrders = removeSellOrders/sum;
+            this.spotBuy = spotBuy/sum;
+            this.spotSell = spotSell/sum;
+            this.limitBuy = limitBuy/sum;
+            this.limitSell = limitSell/sum;
+            this.idle = idle/sum;
+        }
     }
 }

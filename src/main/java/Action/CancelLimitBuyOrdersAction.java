@@ -1,21 +1,24 @@
 package Action;
 
+import Simulation.Agent;
 import Offer.BuyOffer;
-import Simulation.OrderBooks;
+import Simulation.Simulation;
 
 import java.util.List;
 
-public class RemoveBuyOrdersAction extends Action {
+public class CancelLimitBuyOrdersAction extends Action {
 
-  List<BuyOffer> toRemove;
+  public final List<BuyOffer> toRemove;
 
-  public void setOrdersToRemove(List<BuyOffer> toRemove) { this.toRemove = toRemove; }
-
-  @Override
-  public void executeAction(OrderBooks orderBooks) {
-    orderBooks.removeBuyOrders(toRemove);
+  public CancelLimitBuyOrdersAction(Agent performer, List<BuyOffer> toRemove) {
+    super(performer);
+    this.toRemove = toRemove;
   }
 
+  @Override
+  public boolean executeAction(Simulation env) {
+    env.getOrdersBook().removeBuyOrders(toRemove);
+    return true;
+  }
 
 }
-

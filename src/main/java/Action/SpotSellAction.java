@@ -1,22 +1,19 @@
 package Action;
 
-import Simulation.OrderBooks;
+import Simulation.Agent;
+import Simulation.Simulation;
 
-public class SellNowAction  extends Action{
+public class SpotSellAction extends Action
+{
+    public final int offeredStocks;
 
-    Integer quantity;
-    public SellNowAction(Integer quantity) {
-        this.quantity=quantity;
+    public SpotSellAction(Agent performer, int offeredStocks) {
+        super(performer);
+        this.offeredStocks = offeredStocks;
     }
 
     @Override
-    public void executeAction(OrderBooks orderBooks) {
-
-        orderBooks.sellOrder(owner,quantity);
-    }
-
-    public Integer getQuantity()
-    {
-        return  quantity;
+    public boolean executeAction(Simulation env) {
+        return env.getOrdersBook().spotSellOrder(performer, offeredStocks);
     }
 }

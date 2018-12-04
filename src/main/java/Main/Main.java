@@ -2,7 +2,7 @@ package Main;
 
 import Gui.Observable;
 import Gui.PlotManager;
-import Simulation.ExperimentConfiguration;
+import Simulation.Configuration;
 import Simulation.Simulation;
 
 import java.util.Random;
@@ -15,10 +15,10 @@ public class Main
 
   public static void main(String[] args)
   {
-    int ROUNDS = ExperimentConfiguration.ROUNDS;
+    int ROUNDS = Configuration.ROUNDS;
 
     System.out.println("Inizializzazione simulazione.");
-    Simulation sim = new Simulation(new ExperimentConfiguration());
+    Simulation sim = new Simulation(new Configuration());
 
     System.out.println("Inizializzazione grafici");
     PlotManager pm = new PlotManager();
@@ -27,9 +27,13 @@ public class Main
     System.out.println("Inizio simulazione.");
     for (int i = 0; i < ROUNDS; i++)
     {
-      System.out.printf("\rRound %6d/%d - Current price:%5d Number of transactions: %7d", i+1, ROUNDS,sim.marketHistory.getCurrentPrice(),sim.orderBooks.getTransactions().size());
+      System.out.printf("\rRound %6d/%d - Current price:%5d Number of transactions: %7d",
+          i+1,
+          ROUNDS,
+          sim.getOrdersBook().getCurrentAskPrice(),
+          sim.getOrdersBook().getTransactions().size());
       sim.nextTurn();
-      if (i % ExperimentConfiguration.ROUNDS_TO_PLOT == 0) {
+      if (i % Configuration.ROUNDS_TO_PLOT == 0) {
         for(Observable o : PlotManager.watchedObservables)
         {
           pm.updatePlot(o, sim.getObservables().get(o));

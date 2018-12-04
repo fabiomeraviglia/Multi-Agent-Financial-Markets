@@ -1,15 +1,19 @@
 package Action;
 
-import Simulation.OrderBooks;
+import Simulation.Agent;
+import Simulation.Simulation;
 
-public class BuyNowAction  extends Action {
-    private Integer cashQuantity;
-    public BuyNowAction(Integer cashQuantity) { this.cashQuantity = cashQuantity; }
+public class SpotBuyAction extends Action
+{
+    public final int offeredCash;
+
+    public SpotBuyAction(Agent performer, int offeredCash) {
+        super(performer);
+        this.offeredCash = offeredCash;
+    }
 
     @Override
-    public void executeAction(OrderBooks orderBooks)
-    {
-        if(owner.getFreeAssets().getCash() < cashQuantity) { throw  new RuntimeException("impossibile"); }
-        orderBooks.buyOrder(owner, cashQuantity);
+    public boolean executeAction(Simulation env) {
+        return env.getOrdersBook().spotBuyOrder(performer, offeredCash);
     }
 }

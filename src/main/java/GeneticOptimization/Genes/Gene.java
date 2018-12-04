@@ -1,6 +1,6 @@
 package GeneticOptimization.Genes;
 
-import Simulation.ExperimentConfiguration;
+import Simulation.Configuration;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -35,7 +35,7 @@ public abstract class Gene<T> implements Cloneable{
     }
 
     public abstract Gene<T> clone();
-    public final void setConfigurationParameter(ExperimentConfiguration configuration)
+    public final void setConfigurationParameter(Configuration configuration)
     {
         Class<?> c = configuration.getClass();
 

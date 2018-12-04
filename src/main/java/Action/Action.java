@@ -1,16 +1,15 @@
 package Action;
 
 import Simulation.Agent;
-import Simulation.OrderBooks;
+import Simulation.Simulation;
+
 public abstract class Action {
-    Agent owner;
+    public final Agent performer;
 
+    public abstract boolean executeAction(Simulation environment);
 
-    public abstract void executeAction(OrderBooks orderBooks);
-
-    public void setOwner(Agent owner)
+    public Action(Agent performer)
     {
-        this.owner=owner;
+        this.performer = performer;
     }
-    public Agent getOwner() { return owner; }
 }

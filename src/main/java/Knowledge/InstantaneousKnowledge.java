@@ -2,33 +2,32 @@ package Knowledge;
 
 import Offer.BuyOffer;
 import Offer.SellOffer;
+import Simulation.Agent;
 import Simulation.Assets;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class CurrentPricesKnowledge extends Knowledge
+public class InstantaneousKnowledge extends Knowledge
 {
-  public final int bidPrice;
   public final int askPrice;
-  public final List<BuyOffer> activeBuyOffers;
-  public final List<SellOffer> activeSellOffers;
+  public final int bidPrice;
+  public final List<SellOffer> sellOffers;
+  public final List<BuyOffer> buyOffers;
   public final Assets freeAssets;
-  public final Assets offeredAssets;
 
-  public CurrentPricesKnowledge()
+  public InstantaneousKnowledge(
+      Agent holder,
+      int askPrice,
+      int bidPrice,
+      List<SellOffer> sellOffers,
+      List<BuyOffer> buyOffers,
+      Assets freeAssets)
   {
-    this(new CurrentPricesKnowledgeBuilder());
-  }
-
-  public CurrentPricesKnowledge(CurrentPricesKnowledgeBuilder builder)
-  {
-    this.bidPrice = builder.bidPrice;
-    this.askPrice = builder.askPrice;
-    this.activeBuyOffers = builder.activeBuyOffers;
-    this.activeSellOffers = builder.activeSellOffers;
-    this.freeAssets = builder.freeAssets;
-    this.offeredAssets = builder.offeredAssets;
+    super(holder);
+    this.askPrice = askPrice;
+    this.bidPrice = bidPrice;
+    this.sellOffers = sellOffers;
+    this.buyOffers = buyOffers;
+    this.freeAssets = freeAssets;
   }
 }
-

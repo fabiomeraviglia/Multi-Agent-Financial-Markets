@@ -1,32 +1,21 @@
 package Action;
 
-import Offer.BuyOffer;
+import Simulation.Simulation;
 import Simulation.Agent;
-import Simulation.OrderBooks;
 
-public class BuyAction  extends Action {
+public class LimitBuyAction extends Action
+{
+    public final int stockQuantity;
+    public final int price;
 
-    BuyOffer offer;
-    public BuyAction(BuyOffer offer) {
-        this.offer = offer;
+    public LimitBuyAction(Agent performer, int stockQuantity, int price) {
+        super(performer);
+        this.stockQuantity = stockQuantity;
+        this.price = price;
     }
 
     @Override
-    public void executeAction(OrderBooks orderBooks) {
-        if(owner==null) throw new RuntimeException("Owner not set");
-
-
-        owner.getOfferedAssets().addCash(offer.getCost());
-        orderBooks.addBuy(offer);
-
-
-    }
-
-    @Override
-    public void setOwner(Agent owner) {
-        offer.setOwner(owner);
-        super.setOwner(owner);
-
-
+    public boolean executeAction(Simulation env) {
+        return env.getOrdersBook().limitBuyOrder(performer, stockQuantity, price);
     }
 }

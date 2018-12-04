@@ -2,7 +2,7 @@ package GeneticOptimization;
 
 import GeneticOptimization.Genes.Gene;
 import GeneticOptimization.Genes.IntegerGene;
-import Simulation.ExperimentConfiguration;
+import Simulation.Configuration;
 import Simulation.Simulation;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ class ChromosomeFactory {
     };
     public static Simulation ConvertToSimulation(Chromosome chromosome)
     {
-        ExperimentConfiguration configuration = new ExperimentConfiguration();
+        Configuration configuration = new Configuration();
 
         for(Gene gene : chromosome)
         {

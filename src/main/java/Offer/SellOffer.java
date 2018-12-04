@@ -3,34 +3,36 @@ package Offer;
 import Simulation.Agent;
 
 import java.util.Comparator;
-public class SellOffer extends Offer{
-    public SellOffer(Integer stockQuantity, Integer price) {
-        super(stockQuantity, price, null);
-    }
-    public SellOffer(Integer stockQuantity, Integer price, Agent owner) {
-        super(stockQuantity, price, owner);
+
+public class SellOffer extends Offer {
+
+    public SellOffer(Agent owner, int stockQuantity, int price) {
+        super(owner, stockQuantity, price);
+        owner.modifyOfferedStocks(stockQuantity);
+        owner.modifyFreeStocks(-stockQuantity);
     }
 
     @Override
-    public void accept(Agent buyer, Integer quantity) {
-
-        super.accept(buyer,owner,quantity);
-
-        owner.getOfferedAssets().addStocks(-quantity);
-
+    public boolean accept(Agent buyer, int quantity) {
+        Integer totalStocksCost = quantity * price;
+        if (quantity > stockQuantity) { return false; }
+        if (totalStocksCost > buyer.getFreeAssets().cash) { return false; }
+        if (quantity > owner.getOfferedAssets().stocks) { return false; }
+        owner.modifyOfferedStocks(-quantity);
+        buyer.modifyFreeStocks(quantity);
+        owner.modifyFreeCash(totalStocksCost);
+        buyer.modifyFreeCash(-totalStocksCost);
+        this.stockQuantity -= quantity;
+        return true;
     }
 
     @Override
     public void cancel() {
-        owner.getOfferedAssets().addStocks(-getStockQuantity());
+        owner.modifyOfferedStocks(-stockQuantity);
+        owner.modifyFreeStocks(stockQuantity);
     }
 
-    public static class BidComparator implements Comparator<Offer> {
-        @Override
-        public int compare(Offer x, Offer y) {
-            return x.price-y.price;
-        }
+    public static class AskComparator implements Comparator<Offer> {
+        @Override public int compare(Offer x, Offer y) { return x.price - y.price; }
     }
-
-
 }
