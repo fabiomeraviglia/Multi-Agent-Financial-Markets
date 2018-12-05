@@ -1,0 +1,145 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+% A4 paper and 11pt font size
+\documentclass[paper=a4, fontsize=11pt]{scrartcl}
+
+% Use 8-bit encoding that has 256 glyphs
+\usepackage[T1]{fontenc} 
+
+% Use the Adobe Utopia font for the document
+\usepackage{fourier}
+
+% English language/hyphenation
+\usepackage[italian]{babel}
+
+% Math packages
+\usepackage{amsmath,amsfonts,amsthm}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+% Allows customizing section commands
+\usepackage{sectsty}
+
+% Make all sections centered, the default font and small caps
+\allsectionsfont{\centering \normalfont\scshape}
+
+% Custom headers and footers
+\usepackage{fancyhdr}
+
+% Makes all pages in the document conform to the custom headers and footers
+\pagestyle{fancyplain}
+
+% No page header - if you want one, create it in the same way as the footers below
+\fancyhead{}
+
+% Page numbering for right footer
+\fancyfoot[L]{}
+\fancyfoot[C]{}
+\fancyfoot[R]{\thepage} 
+
+% Remove header and footer underlines
+\renewcommand{\headrulewidth}{0pt} 
+\renewcommand{\footrulewidth}{0pt}
+
+% Customize the height of the header
+\setlength{\headheight}{13.6pt}
+
+% Number equations, figures and tables within sections
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+
+% Removes all indentation from paragraphs
+\setlength\parindent{0pt}
+
+% Create horizontal rule command with 1 argument of height
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} 
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{	
+\normalfont \normalsize 
+\textsc{università degli studi milano bicocca} \\ [25pt]
+\horrule{0.5pt} \\ [0.4cm]
+\huge Documentazione ADAFMarket \\
+\horrule{2pt} \\ [0.5cm]
+}
+
+\author{Danilo Benetti e Fabio Meraviglia} % Your name
+
+\date{\normalsize\today} % Today's date or a custom date
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	PDF E CDF SCELTA DEL PREZZO
+%----------------------------------------------------------------------------------------
+
+\section{PDF per la scelta dei prezzi di acquisto e vendita}
+
+Sia $P_b(p)$ la funzione di densità di probabilità di una variabile aleatoria che descrive il prezzo di acquisto a cui un agente posiziona un proprio buy limit order nel libro contabile. Proprietà desiderabile di $P_b(p)$ è che sia positiva e monotona crescente tra $0$ e il prezzo di bid $b$ e positiva e monotona decrescente tra $b$ e il prezzo di ask $a$. Optiamo per un andamento polinomiale del tipo
+
+\begin{align}
+P_b(p) = \left\{\begin{array}{ll}
+         \alpha \cdot p^r     & \text{per } 0 \leq p < b \\
+         \beta  \cdot (p-b)^m & \text{per } b \leq p < a \\
+         0                    & \text{altrimenti } \end{array}\right.
+\end{align}
+
+Dove $\alpha > 0$ e $r, m \geq 1$ sono dei parametri da ottimizzare in fase di calibrazione. Trattandosi di una funzione di densità di probabilità, occorre che il suo integrale sull'intero spazio dei reali sia unitario. Tale condizione può essere soddisfatta al variare di $\alpha$, $r$ e $m$ ponendo
+
+\begin{align}
+\beta = \frac{m+1}{(b-a)^{m+1}} \cdot \left(\frac{b^{r+1}\cdot\alpha}{r+1}-1\right)
+\end{align}
+
+Sia ora invece $P_a(p)$ la funzione di densità di probabilità di una variabile aleatoria che descrive il prezzo di vendita a cui un agente posiziona un proprio sell limit order nel libro contabile. Osserviamo che per via della natura del problema, mentre $P_b(p)$ ha supporto di misura finita (i.e. un agente deve scegliere un prezzo di vendita necessariamente compreso tra $0$ e il prezzo di ask), $P_a(p)$ ha invece un supporto di misura infinita (i.e. un agente può scegliere un qualsiasi prezzo di acquisto maggiore del prezzo di bid).\\
+
+La nostra ipotesi, volta a risolvere tale asimetria, consiste nel supporre che la probabilità che un agente scelga un prezzo $k$ volte inferiore rispetto all'attuale prezzo di bid in occasione di un acquisto, sia uguale alla probabilità che un agente scelga un prezzo $k$ volte superiore rispetto all'attuale prezzo di ask in occasione di una vendita.
+
+\begin{align}
+\begin{split}
+P_b(p < b / k) & = P_a(p > a \cdot k) \quad \forall k \\
+\int_0^{b/k} \alpha \cdot p^r \diff p & = \int_{a \cdot k}^\infty P_a(p) \diff p \\
+\frac{\alpha}{r+1} \left(\frac{b}{k}\right)^{r+1} & = \lim_{p \to \infty} \mathcal{P}_a(p) - \mathcal{P}_a(a \cdot k) \\
+\frac{\alpha}{r+1} \left(\frac{b}{k}\right)^{r+1} & = - \mathcal{P}_a(a \cdot k) \\
+- \frac{\alpha}{r+1} \left(\frac{a \cdot b}{k}\right)^{r+1} & = \mathcal{P}_a(k)
+\end{split}
+\end{align}
+
+E dunque, derivando $\mathcal{P}_a(p)$, possiamo ottenre l'espressione di $P_a$.
+
+\begin{align}
+P_a(p) = \left\{\begin{array}{ll}
+         \alpha  \frac{(a \cdot b)^{r+1}}{p^{r+2}}  & \text{per } p > a \\
+         \gamma  \cdot (b - p)^m                    & \text{per } b < p \leq a \\
+         0   & \text{altrimenti } \end{array}\right.
+\end{align}
+
+Anche qui occorre porre un vincolo sul parametro $gamma$ al fine di renderne unitaria la misura sullo spazio dei reali.
+
+\begin{align}
+\gamma = \beta = \frac{m+1}{(b-a)^{m+1}} \cdot  \left(\frac{b^{r+1}\cdot\alpha}{r+1}-1\right)
+\end{align}
+
+\end{document}
