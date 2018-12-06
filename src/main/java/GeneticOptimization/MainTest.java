@@ -5,9 +5,10 @@ public class MainTest {
     {
         OptimizationManager optimizationManager = new OptimizationManager();
 
-        optimizationManager.runOptimization(2000);
+        System.out.println("Starting geneticOptimization");
+        optimizationManager.runOptimization(GeneticExperimentHyperparameters.getRunTime());
 
-        optimizationManager.loadPreviousRun("d");
+        optimizationManager.loadPreviousRun("prova");
 
     }
 }

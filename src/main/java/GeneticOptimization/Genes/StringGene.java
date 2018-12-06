@@ -1,8 +1,9 @@
 package GeneticOptimization.Genes;
 
-import Main.Main;
+import GeneticOptimization.OptimizationManager;
 
 public class StringGene extends Gene<String> {
+    private static final long serialVersionUID = 8522235364953848261L;
     private final String[] range;
     public StringGene(String name, String[] range)
     {
@@ -23,7 +24,7 @@ public class StringGene extends Gene<String> {
     @Override
     public Gene<String> getRandomGene() {
 
-        String chosen = range[Main.r.nextInt(range.length)];
+        String chosen = range[OptimizationManager.r.nextInt(range.length)];
 
         return new StringGene(getName(), chosen, range);
     }

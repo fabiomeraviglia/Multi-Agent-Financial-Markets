@@ -1,9 +1,10 @@
 package GeneticOptimization.Genes;
 
-import Main.Main;
+import GeneticOptimization.OptimizationManager;
 
 public class IntegerGene extends Gene<Integer>{
 
+    private static final long serialVersionUID = -3243909088931194003L;
     private final Integer minValue;
     private final Integer maxValue;
     public IntegerGene(String name, Integer minValue, Integer maxValue)
@@ -21,11 +22,11 @@ public class IntegerGene extends Gene<Integer>{
     @Override
     public Gene<Integer> getMutation() {
 
-        if(Main.r.nextDouble()<0.5) {
+        if(OptimizationManager.r.nextDouble()<0.5) {
 
             Integer distanceFromBorder = Math.min(maxValue-getValue(), getValue()-minValue);
 
-            double variation = (Main.r.nextGaussian()*((double)distanceFromBorder))/3;
+            double variation = (OptimizationManager.r.nextGaussian()*((double)distanceFromBorder))/3;
 
             Integer value = (int)(((double)getValue())+variation);
 
@@ -39,7 +40,7 @@ public class IntegerGene extends Gene<Integer>{
     @Override
     public Gene<Integer> getRandomGene() {
 
-        Integer value = Main.r.nextInt(maxValue-minValue+1)+minValue;
+        Integer value = OptimizationManager.r.nextInt(maxValue-minValue+1)+minValue;
         return  new IntegerGene(getName(),value, minValue,maxValue );
     }
 

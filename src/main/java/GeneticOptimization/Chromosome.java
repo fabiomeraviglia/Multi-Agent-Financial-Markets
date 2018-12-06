@@ -1,7 +1,6 @@
 package GeneticOptimization;
 
 import GeneticOptimization.Genes.Gene;
-import Main.Main;
 import org.apache.commons.math3.exception.NullArgumentException;
 
 import java.io.Serializable;
@@ -12,9 +11,10 @@ public final class Chromosome implements Serializable, Iterable<Gene> {
 
     private static final long serialVersionUID = -584677331246077114L;
     private final ArrayList<Gene> genes = new ArrayList<>();
-
-    public Chromosome(Collection<Gene> genes)
+    private String name;
+    public Chromosome(Collection<Gene> genes, String name)
     {
+        this.name = name;
         for(Gene gene : genes)
         {
             if(gene==null) throw  new NullArgumentException();
@@ -33,15 +33,15 @@ public final class Chromosome implements Serializable, Iterable<Gene> {
         childrenGenes.add(new ArrayList<>());
 
         for(int i=0;i<genesNumber;i++) {
-                int index = Main.r.nextInt(2);
+                int index = OptimizationManager.r.nextInt(2);
                 childrenGenes.get(index).add(father.get(i));
                 childrenGenes.get(1-index).add(mother.get(i));
         }
 
         Chromosome[] result = new Chromosome[2];
 
-        result[0]=new Chromosome(childrenGenes.get(0));
-        result[1]= new Chromosome(childrenGenes.get(1));
+        result[0]=new Chromosome(childrenGenes.get(0), father.name+"1");
+        result[1]= new Chromosome(childrenGenes.get(1), father.name+"2");
 
         return result;
     }
@@ -94,10 +94,13 @@ public final class Chromosome implements Serializable, Iterable<Gene> {
 
         return Objects.hash(genes);
     }
-
+    public String getName()
+    {
+        return name;
+    }
     @Override
     public String toString() {
-        return "Chromosome{" +
+        return "Chromosome '"+name+"'{" +
                 "genes=" + genes +
                 '}';
     }

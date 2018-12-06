@@ -1,17 +1,19 @@
 package GeneticOptimization;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
-class OptimizationManager {
+
+public class OptimizationManager {
 
     private final List<ChromosomeFitness> bestChromosomes = new ArrayList<>();
+    public static final Random r = new Random();
     private GeneticOptimizationSimulation optimizationSimulation=null;
 
 
+    public OptimizationManager()
+    {
+    }
 
 
     public void runOptimization(long maxExecutionTimeMillis)
@@ -21,6 +23,7 @@ class OptimizationManager {
 
         while(executionTimeLeft(initialTime, maxExecutionTimeMillis)>0) {
 
+            System.out.println("Starting new optimization run");
             optimizationSimulation.runOptimization(executionTimeLeft(initialTime,maxExecutionTimeMillis));
             ChromosomeFitness bestChromosome = optimizationSimulation.getBestChromosomeFitness();
 
@@ -28,10 +31,13 @@ class OptimizationManager {
 
             if(executionTimeLeft(initialTime,maxExecutionTimeMillis)>0)
             {
+                System.out.println("Execution time left "+executionTimeLeft(initialTime,maxExecutionTimeMillis)/1000 + "seconds");
                 saveBest();
+                System.out.println("Saved best chromosomes");
             }
             else
             {
+                System.out.println("Execution time finished, saving configuration");
                 saveConfiguration(optimizationSimulation);
             }
 
@@ -45,14 +51,14 @@ class OptimizationManager {
 
     }
     private void saveBest() {
-        String content;
+        StringBuilder content;
         if(bestChromosomes.size()==0) return;
-        content=bestChromosomes.get(0).toString();
+        content = new StringBuilder(bestChromosomes.get(0).toString());
         for(int i=1;i<bestChromosomes.size();i++)
         {
-            content="\r\n"+bestChromosomes.get(i);
+            content.append("\r\n").append(bestChromosomes.get(i).toString());
         }
-        SerializationManager.saveToFile(getFileName("Best Chromosomes "),content);
+        SerializationManager.saveToFile(getFileName("Best Chromosomes "), content.toString());
     }
 
     private void saveConfiguration( GeneticOptimizationSimulation optimizationSimulation) {
@@ -68,7 +74,8 @@ class OptimizationManager {
     {
         if(bestChromosomes.size()==0) return null;
 
-        ChromosomeFitness[] bestChromosomesArray = (ChromosomeFitness[]) bestChromosomes.toArray();
+        ChromosomeFitness[] bestChromosomesArray =  bestChromosomes.toArray(new ChromosomeFitness[0]);
+
         Arrays.sort(bestChromosomesArray);
         return bestChromosomesArray[bestChromosomesArray.length-1];
     }

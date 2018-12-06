@@ -16,6 +16,7 @@ public class Simulation {
     private OrdersBook ordersBook;
     private Integer turn;
 
+
     public final Configuration configuration;
 
     private final Map<Observable, Consumer<List<Pair<Integer, Double>>>> observablesUpdateFunctions;
@@ -34,6 +35,7 @@ public class Simulation {
     }
 
     public Map<Observable, List<Pair<Integer, Double>>> getObservables() { return observables; }
+    public List<Pair<Integer, Double>> getObservable(Observable ob) { return observables.get(ob); }
     public OrdersBook getOrdersBook() { return ordersBook; }
 
     public void nextTurn()
@@ -174,5 +176,9 @@ public class Simulation {
             : configuration.INITIAL_PRICE;
         double logSpread = Math.log(lastAskPrice) - Math.log(lastBidPrice);
         s.add(new Pair<>(lastTime + 1, logSpread));
+    }
+
+    public Integer getTurn() {
+        return turn;
     }
 }

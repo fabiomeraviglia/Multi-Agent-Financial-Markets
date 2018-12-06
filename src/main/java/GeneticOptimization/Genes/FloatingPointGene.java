@@ -1,7 +1,9 @@
 package GeneticOptimization.Genes;
-import Main.Main;
+
+import GeneticOptimization.OptimizationManager;
 public class FloatingPointGene extends Gene<Double> {
 
+    private static final long serialVersionUID = 7519323639287519811L;
     private final Double minValue;
     private final Double maxValue;
     public FloatingPointGene(String name, Double minValue, Double maxValue)
@@ -22,11 +24,11 @@ public class FloatingPointGene extends Gene<Double> {
     public Gene<Double> getMutation()
     {
 
-        if(Main.r.nextDouble()<0.5) {
+        if(OptimizationManager.r.nextDouble()<0.5) {
 
             double distanceFromBorder = Math.min(maxValue-getValue(), getValue()-minValue);
 
-            double variation = (Main.r.nextGaussian()*distanceFromBorder)/3;
+            double variation = (OptimizationManager.r.nextGaussian()*distanceFromBorder)/3;
 
             double value = getValue()+variation;
             if(value<minValue) value= minValue;
@@ -38,7 +40,7 @@ public class FloatingPointGene extends Gene<Double> {
 
     @Override
     public Gene<Double> getRandomGene() {
-        double value = Main.r.nextDouble()*(maxValue-minValue)+ minValue;
+        double value = OptimizationManager.r.nextDouble()*(maxValue-minValue)+ minValue;
 
 
         return  new FloatingPointGene(getName(),value, minValue,maxValue );

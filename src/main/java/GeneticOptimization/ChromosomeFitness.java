@@ -12,7 +12,9 @@ public class ChromosomeFitness implements Comparable<ChromosomeFitness>, Seriali
     public ChromosomeFitness(Chromosome chromosome, Double fitness)
     {
         if(chromosome==null) throw  new NullArgumentException();
-        if(fitness==null) throw  new NullArgumentException();
+        if(fitness==null || fitness.isNaN()) {
+           System.out.print("");
+        }
         this.chromosome=chromosome;
         this.fitness=fitness;
     }

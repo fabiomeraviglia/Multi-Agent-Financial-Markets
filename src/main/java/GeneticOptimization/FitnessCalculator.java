@@ -19,6 +19,6 @@ class FitnessCalculator {
             cumulativeDifference+=Math.pow(difference,2);
 
         }
-        return  Math.sqrt(cumulativeDifference);
+        return  1/Math.sqrt(cumulativeDifference);
     }
 }

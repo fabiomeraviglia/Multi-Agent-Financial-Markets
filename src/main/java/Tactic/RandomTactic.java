@@ -1,16 +1,8 @@
 package Tactic;
 
-import Action.Action;
-import Action.NullAction;
-import Knowledge.Knowledge;
+import Action.*;
 import Knowledge.InstantaneousKnowledge;
-import Action.LimitBuyAction;
-import Action.LimitSellAction;
-import Action.SpotSellAction;
-import Action.SpotBuyAction;
-import Action.CancelLimitBuyOrdersAction;
-import Action.CancelLimitSellOrdersAction;
-import Main.Main;
+import Knowledge.Knowledge;
 import Offer.BuyOffer;
 import Offer.SellOffer;
 
@@ -21,7 +13,8 @@ import java.util.Random;
 
 public class RandomTactic extends Tactic
 {
-    private static final Random r = Main.r;
+    private static final Random r = new Random(System.currentTimeMillis());
+
     public final double variance;
     public final ActionChances actionChances;
 
