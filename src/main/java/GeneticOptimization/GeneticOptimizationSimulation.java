@@ -1,7 +1,6 @@
 package GeneticOptimization;
 
 import GeneticOptimization.Genes.Gene;
-import Main.Main;
 
 import java.io.Serializable;
 import java.util.*;
@@ -17,9 +16,9 @@ public class GeneticOptimizationSimulation implements Serializable{
     private final double CROSSOVER_RATE=GeneticExperimentHyperparameters.CROSSOVER_RATE;
     private final double ELITISM_RATE = GeneticExperimentHyperparameters.ELITISM_RATE;
     private final int POPULATION_SIZE =GeneticExperimentHyperparameters.POPULATION_SIZE;
-    private final int INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS= GeneticExperimentHyperparameters.INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS;
 
     private final int ELITE_SIZE = getEliteSize();
+    private int generationNumber = 1;
     public GeneticOptimizationSimulation()
     {
         this.createChromosomes();
@@ -27,17 +26,35 @@ public class GeneticOptimizationSimulation implements Serializable{
 
     public void runOptimization(long maxExecutionTime)
     {
+
         long initialTime=System.currentTimeMillis();
+
+
         evaluation();
         while(executionTimeLeft(maxExecutionTime, initialTime) && fitnessImproved()) {
-
+            print();
             selectionAndReproduction();
             crossover();
             mutation();
             evaluation();
+            generationNumber++;
         }
     }
+    private void print()
+    {
+        System.out.print("Executing generation number "+generationNumber);
 
+        System.out.println(" Current best fitness = "+ getBestChromosomeFitness().getFitness());
+
+        if(getBestChromosomeFitness().getFitness().isNaN())
+            return;
+
+        for(ChromosomeFitness fitness : chromosomesFitness.values())
+        {
+            if(fitness.getFitness().isNaN())
+                return;
+        }
+    }
 
     //valuta i chromosome presenti nella lista chromosomes e aggiunge il loro fitness nella map chromosomeFitness
     //aggiunge un valore ad bestFitnessForGeneration
@@ -53,9 +70,15 @@ public class GeneticOptimizationSimulation implements Serializable{
         computeFitness(chromosomesToEvaluate);
 
         addBestFitness();
+        addBestToBestChromosomesMap();
+
     }
 
     private void computeFitness(List<Chromosome> chromosomes) {
+
+        if(chromosomes.size()==0)
+            return;
+
         Chromosome[] chromosomesArray = new Chromosome[chromosomes.size()];
         chromosomesArray= chromosomes.toArray(chromosomesArray);
 
@@ -83,7 +106,6 @@ public class GeneticOptimizationSimulation implements Serializable{
     //select the chromosomes that will be reproduced and replaces the chromosomes in the array chromosomes
     //inserisce migliori in bestChromosomes
     private void selectionAndReproduction() {
-        addBestToBestChromosomesMap();
 
         chromosomes= selectNewChromosomes();
 
@@ -132,8 +154,8 @@ public class GeneticOptimizationSimulation implements Serializable{
         for (int i = count; i < n; i++) {
             int index;
             do {
-                index = Main.r.nextInt(n);
-            } while (!(Main.r.nextDouble() < weight[index] / maxWeight));
+                index = OptimizationManager.r.nextInt(n);
+            } while (!(OptimizationManager.r.nextDouble() < weight[index] / maxWeight));
             newChromosomes[i]=chromosomes[index];
         }
 
@@ -146,7 +168,7 @@ public class GeneticOptimizationSimulation implements Serializable{
 
         for(int i=ELITE_SIZE;i<POPULATION_SIZE-1;i=i+2)
         {
-            if(Main.r.nextDouble()<CROSSOVER_RATE)
+            if(OptimizationManager.r.nextDouble()<CROSSOVER_RATE)
             {
                 Chromosome[] children = Chromosome.makeCrossover(chromosomes[i],chromosomes[i+1]);
                 chromosomes[i]=children[0];
@@ -177,22 +199,23 @@ public class GeneticOptimizationSimulation implements Serializable{
             List<Gene> newGenes = new ArrayList<>();
             for(Gene gene : chromosomes[i]) {
 
-                if (Main.r.nextDouble() < MUTATION_RATE) {
+                if (OptimizationManager.r.nextDouble() < MUTATION_RATE) {
                     gene = gene.getMutation();
                 }
                 newGenes.add(gene);
             }
-            chromosomes[i]=new Chromosome(newGenes);
+            chromosomes[i]=new Chromosome(newGenes,chromosomes[i].getName()+"M");
         }
     }
 
 
     private boolean fitnessImproved() {
         int generations = bestFitnessForGenerations.size();
-        if(generations<INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS) return true;
-        double max = maxInRange(bestFitnessForGenerations, 0,bestFitnessForGenerations.size()-INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS);
+        int INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS = GeneticExperimentHyperparameters.INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS;
+        if(generations<= INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS) return true;
+        double max = maxInRange(bestFitnessForGenerations, 0,bestFitnessForGenerations.size()- INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS);
 
-        for(int i=generations-INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS; i<generations;i++)
+        for(int i = generations- INTERRUPT_AFTER_N_GENERATIONS_WITHOUT_IMPROVEMENTS; i<generations; i++)
         {
             if(bestFitnessForGenerations.get(i)> max) return true;
 
@@ -204,8 +227,8 @@ public class GeneticOptimizationSimulation implements Serializable{
         double max = -1;
         for(int i = start; i< elementsNumber+start;i++)
         {
-            if(max<bestFitnessForGenerations.get(0))
-                max= bestFitnessForGenerations.get(0);
+            if(max<bestFitnessForGenerations.get(i))
+                max= bestFitnessForGenerations.get(i);
         }
         return max;
     }
@@ -226,9 +249,17 @@ public class GeneticOptimizationSimulation implements Serializable{
 
     public ChromosomeFitness getBestChromosomeFitness()
     {
-        ChromosomeFitness[] chromosomeFitnesses= (ChromosomeFitness[]) bestChromosomes.toArray();
-        Arrays.sort(chromosomeFitnesses);
-        return chromosomeFitnesses[chromosomeFitnesses.length-1];
+        Chromosome[] bestChromosomesArray= bestChromosomes.toArray(new Chromosome[0]);
+
+        ChromosomeFitness [] bestChromosomeFitnessesArray= new ChromosomeFitness[ELITE_SIZE];
+        for(int i=0; i<ELITE_SIZE; i++)
+        {
+            ChromosomeFitness fitness =chromosomesFitness.get(bestChromosomesArray[i]);
+            bestChromosomeFitnessesArray[i]=fitness;
+        }
+        Arrays.sort(bestChromosomeFitnessesArray);
+
+        return bestChromosomeFitnessesArray[ELITE_SIZE-1];
     }
     private int getEliteSize()
     {

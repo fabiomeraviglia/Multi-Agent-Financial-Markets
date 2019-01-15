@@ -1,13 +1,14 @@
 package Simulation;
 
-import Perception.Perception;
-import Tactic.Tactic;
-import Tactic.RandomTactic;
 import Perception.InstantaneousPerception;
+import Perception.Perception;
+import Tactic.RandomTactic;
+import Tactic.Tactic;
 
 public class Configuration
 {
     public static int ROUNDS = 50000;
+
     public int NUMBER_OF_AGENTS = 500;
     public int INITIAL_STOCKS = 10;
     public int INITIAL_CASH = 10000;
@@ -17,6 +18,8 @@ public class Configuration
     public Perception PERCEPTION = new InstantaneousPerception();
 
     public static int ROUNDS_TO_PLOT = 500;
+
+
 
     public void setConfiguration(ConfigurationType type)
     {

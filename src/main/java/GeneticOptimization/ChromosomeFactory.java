@@ -7,6 +7,7 @@ import Simulation.Simulation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 class ChromosomeFactory {
 
@@ -37,6 +38,11 @@ class ChromosomeFactory {
             newGenes.add(gene.getRandomGene());
         }
 
-        return new Chromosome(newGenes);
+        Random r = OptimizationManager.r;
+        String[] alphabet ={"a","b","c","d","e","f","g","h","i","m","n","o","p","q","r","s","t","u","v","z","x","y","j","k","w","Q","W","E","R","T","Y","U","I","O","P","A","S","D","F","G","H","J","K","L","N","B","V","C","X","Z"};
+        StringBuilder name = new StringBuilder();
+        for(int i =0 ; i<3;i++) name.append(alphabet[r.nextInt(alphabet.length)]);
+
+        return new Chromosome(newGenes, name.toString());
     }
 }

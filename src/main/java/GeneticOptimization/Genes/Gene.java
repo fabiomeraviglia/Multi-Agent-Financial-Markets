@@ -2,10 +2,11 @@ package GeneticOptimization.Genes;
 
 import Simulation.Configuration;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-public abstract class Gene<T> implements Cloneable{
+public abstract class Gene<T> implements Cloneable, Serializable {
     final private String name;
     final private T value;
     Gene(String name, T value)
@@ -49,5 +50,8 @@ public abstract class Gene<T> implements Cloneable{
             throw new RuntimeException("Error in gene.setConfigurationParameter");
         }
 
+    }
+   @Override public String toString(){
+        return name+":"+value;
     }
 }
