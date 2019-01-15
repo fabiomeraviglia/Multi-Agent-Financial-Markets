@@ -22,12 +22,18 @@ import java.util.Random;
 public class RandomTactic extends Tactic
 {
     private static final Random r = Main.r;
-    public final double variance;
+    public final double rCoeff;
+    public final double mCoeff;
+    public final double alphaFractionCoeff;
     public final ActionChances actionChances;
 
-    public RandomTactic(double variance, ActionChances actionChances)
+    public RandomTactic(double alphaFractionCoeff, double rCoeff, double mCoeff, ActionChances actionChances)
     {
-        this.variance = variance;
+        this.rCoeff = rCoeff;
+        this.mCoeff = mCoeff;
+        this.alphaFractionCoeff = alphaFractionCoeff;
+        assert alphaFractionCoeff > 0 && alphaFractionCoeff < 1; // check 0 < alphaFraction < 1
+        assert Math.ceil(mCoeff) == mCoeff; // check if m is an integer.
         this.actionChances = actionChances;
     }
 
@@ -51,12 +57,34 @@ public class RandomTactic extends Tactic
 
     private int generateRandomBuyPrice(int ask, int bid)
     {
-        return Math.max(r.nextInt(Math.max(ask, 1)), 1);
+        double alpha = alphaFractionCoeff * (rCoeff + 1) / Math.pow(bid, rCoeff+1);
+        double beta = (mCoeff + 1) / Math.pow((double)(bid - ask), mCoeff + 1)
+                    * (alpha * Math.pow((double)bid, rCoeff+1)/(rCoeff+1) - 1);
+        double x = 1 - r.nextDouble();
+        if (0 < x && x <= alpha * Math.pow((double)bid, rCoeff + 1) / (rCoeff + 1))
+        {
+            return (int)(Math.pow(x * (rCoeff + 1) / alpha, 1/(rCoeff+1)));
+        }
+        else
+        {
+            return ask + (int)(Math.pow(-1.0, mCoeff) * Math.pow((mCoeff+1)/beta * (x - 1), 1/(mCoeff+1)));
+        }
     }
 
     private int generateRandomSellPrice(int ask, int bid)
     {
-        return Math.max(r.nextInt(Math.max(10*bid - bid, 1)) + bid, 1);
+        double alpha = alphaFractionCoeff * (rCoeff + 1) / Math.pow(bid, rCoeff+1);
+        double beta = (mCoeff + 1) / Math.pow((double)(bid - ask), mCoeff + 1)
+            * (alpha * Math.pow((double)bid, rCoeff+1)/(rCoeff+1) - 1);
+        double x = 1 - r.nextDouble();
+        if (0 < x && x <= -beta / (mCoeff+1) * Math.pow((double)(bid - ask), mCoeff+1))
+        {
+            return bid + (int) (Math.pow(-1.0, mCoeff + 1) * Math.pow(-(mCoeff + 1) / beta * x, 1 / (mCoeff + 1)));
+        }
+        else
+        {
+            return (int)((double)(ask * bid) / Math.pow((rCoeff+1) / alpha * (1-x), 1/(rCoeff+1)));
+        }
     }
 
     private Action generateRandomLimitBuyAction(InstantaneousKnowledge knowledge) {

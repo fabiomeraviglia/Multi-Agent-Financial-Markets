@@ -43,6 +43,9 @@
 % Custom headers and footers
 \usepackage{fancyhdr}
 
+% Image package
+\usepackage{graphicx}
+
 % Makes all pages in the document conform to the custom headers and footers
 \pagestyle{fancyplain}
 
@@ -103,7 +106,7 @@ Sia $P_b(p)$ la funzione di densità di probabilità di una variabile aleatoria 
 \begin{align}
 P_b(p) = \left\{\begin{array}{ll}
          \alpha \cdot p^r     & \text{per } 0 \leq p < b \\
-         \beta  \cdot (p-b)^m & \text{per } b \leq p < a \\
+         \beta  \cdot (p-a)^m & \text{per } b \leq p < a \\
          0                    & \text{altrimenti } \end{array}\right.
 \end{align}
 
@@ -111,6 +114,12 @@ Dove $\alpha > 0$ e $r, m \geq 1$ sono dei parametri da ottimizzare in fase di c
 
 \begin{align}
 \beta = \frac{m+1}{(b-a)^{m+1}} \cdot \left(\frac{b^{r+1}\cdot\alpha}{r+1}-1\right)
+\end{align}
+
+Si osservi che essendo $b - a < 0$, $m$ non può assumere qualsiasi valore reale positivo, ma solo valori interi. Inoltre affinchè $P_b(p)$ risulti positiva in tutto il suo dominio, deve valere la seguente relazione
+
+\begin{align}
+\alpha < \frac{r+1}{b^{r+1}}
 \end{align}
 
 Sia ora invece $P_a(p)$ la funzione di densità di probabilità di una variabile aleatoria che descrive il prezzo di vendita a cui un agente posiziona un proprio sell limit order nel libro contabile. Osserviamo che per via della natura del problema, mentre $P_b(p)$ ha supporto di misura finita (i.e. un agente deve scegliere un prezzo di vendita necessariamente compreso tra $0$ e il prezzo di ask), $P_a(p)$ ha invece un supporto di misura infinita (i.e. un agente può scegliere un qualsiasi prezzo di acquisto maggiore del prezzo di bid).\\
@@ -136,10 +145,45 @@ P_a(p) = \left\{\begin{array}{ll}
          0   & \text{altrimenti } \end{array}\right.
 \end{align}
 
-Anche qui occorre porre un vincolo sul parametro $gamma$ al fine di renderne unitaria la misura sullo spazio dei reali.
+Anche qui occorre porre un vincolo sul parametro $\gamma$ al fine di renderne unitaria la misura sullo spazio dei reali.
 
 \begin{align}
 \gamma = \beta = \frac{m+1}{(b-a)^{m+1}} \cdot  \left(\frac{b^{r+1}\cdot\alpha}{r+1}-1\right)
 \end{align}
+
+\subsection{Espressione delle CDF inverse}
+
+Ai fini di implementare tali distribuzioni di probabilità nel modello, occorre calcolare le relative funzioni di distribuzione di probabilità comulative inverse, le cui espressioni riportiamo di seguito per comodità di riferimento.
+
+\begin{align}
+\begin{split}
+\mathcal{P}_b(p) &= \left\{ \begin{array}{ll}
+         \alpha \frac{p^{r+1}}{r+1}          & \text{per } 0 \leq p < b \\
+         1 + \frac{\beta}{m+1} (p-a)^{m+1}   & \text{per } b \leq p < a 
+         \end{array}\right. \\
+\mathcal{P}_a(p) &= \left\{ \begin{array}{ll}
+         -\frac{\beta}{m+1} (b - p)^{m+1}    & \text{per } b < p \leq a \\
+         1-\frac{\alpha}{r+1}
+         \left(\frac{ab}{p}\right)^{r+1}     & \text{per } p > a
+         \end{array}\right.
+\end{split}
+\end{align}
+
+\begin{align}
+\begin{split}
+\mathcal{P}^{-1}_b(p) &= \left\{ \begin{array}{ll}
+         \sqrt[r+1]{\frac{p(r+1)}{\alpha}}   & \text{per } 0 < p \leq \frac{\alpha b^{r+1}}{r+1} \\
+         (-1)^m \sqrt[m+1]{
+         	\frac{m+1}{\beta}(p-1)} + a      & \text{per } \frac{\alpha b^{r+1}}{r+1} < p \leq 1 
+         \end{array}\right. \\
+\mathcal{P}^{-1}_a(p) &= \left\{ \begin{array}{ll}
+         b + (-1)^{m+1} \sqrt[m+1]{
+         	\frac{m+1}{-\beta} p}            & \text{per } 0 < p \leq - \frac{\beta}{m+1} (b-a)^{m+1} \\
+         \frac{ab}{\sqrt[r+1]{
+         	\frac{r+1}{\alpha}(1-p)}}        & \text{per } - \frac{\beta}{m+1} (b-a)^{m+1} < p \leq 1
+         \end{array}\right.
+\end{split}
+\end{align}
+
 
 \end{document}
