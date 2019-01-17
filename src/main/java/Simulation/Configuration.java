@@ -11,9 +11,10 @@ public class Configuration
 
     public int NUMBER_OF_AGENTS = 500;
     public int INITIAL_STOCKS = 10;
-    public int INITIAL_CASH = 100000;
-    public int INITIAL_PRICE = 1000;
-    public Tactic TACTIC = new RandomTactic(0.0, new RandomTactic.ActionChances(0.05, 0.05, 0.1, 0.1, 1.0, 1.0, 0.2));
+    public int INITIAL_CASH = 10000;
+    public int INITIAL_PRICE = 2000;
+    public Tactic TACTIC = new RandomTactic(3.0/4.0, 2.0, 5.0,
+        new RandomTactic.ActionChances(0.05, 0.05, 0.1, 0.1, 1.0, 1.0, 0.2));
     public Perception PERCEPTION = new InstantaneousPerception();
 
     public static int ROUNDS_TO_PLOT = 500;
