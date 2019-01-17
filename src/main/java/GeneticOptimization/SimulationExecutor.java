@@ -10,13 +10,15 @@ public class SimulationExecutor implements Runnable {
     {
         this.simulation = simulation;
     }
+
     @Override
     public void run() {
         for(int i=0;i<GeneticExperimentHyperparameters.ROUNDS_OF_SIMULATION;i++) {
             simulation.nextTurn();
         }
     }
-    public SimulationResults getResults()
+
+    public SimulationResults getResults()  throws Exception
     {
         return SimulationResultsCalculator.calculateResult(simulation);
     }

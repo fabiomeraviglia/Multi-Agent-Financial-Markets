@@ -47,8 +47,19 @@ class SimulationManager  {
 
         for(int i =0; i<n;i++)
         {
-            SimulationResults result = simulationExecutors[i].getResults();
-            Double fitness= FitnessCalculator.getFitness(result);
+            Double fitness;
+
+            try {
+                SimulationResults result = simulationExecutors[i].getResults();
+                fitness = FitnessCalculator.getFitness(result);
+                if(fitness.isNaN())
+                    fitness = FitnessCalculator.getFitness(result);
+            }
+            catch (Exception ex)
+            {
+                System.out.println("Errore:"+ex.getMessage());
+                fitness=0.0;
+            }
             Chromosome chromosome = chromosomes[i];
             results[i] = new ChromosomeFitness(chromosome, fitness);
         }

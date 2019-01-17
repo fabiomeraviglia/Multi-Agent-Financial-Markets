@@ -5,8 +5,7 @@ import Statistics.StatisticsCalculator;
 
 class SimulationResultsCalculator {
 
-    public static SimulationResults calculateResult(Simulation simulation) {
-
+    public static SimulationResults calculateResult(Simulation simulation) throws Exception {
 
         StatisticsCalculator statisticsCalculator = new StatisticsCalculator(simulation);
         statisticsCalculator.setWarmupRoundsNumber(GeneticExperimentHyperparameters.WARMUP_ROUNDS_FOR_STATISTICS);

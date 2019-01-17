@@ -22,18 +22,19 @@ public class StatisticsCalculator {
     private Simulation simulation;
     public StatisticsCalculator(Simulation simulation) {
         if(simulation==null) throw new NullArgumentException();
+        if(simulation.getObservable(Observable.LOG_SPREAD).size()!=simulation.getObservable(Observable.LOG_RETURNS).size())
+            throw  new RuntimeException("Corrupted simulation");
         this.simulation=simulation;
+
     }
     /*
     More efficient to  calculate everything together
      */
-    public void calculateEverything()
-    {
+    public void calculateEverything() throws Exception {
             calculateSpreadStatistics();
             calculateLogReturnsStatistics();
     }
-    public void calculateSpreadStatistics()
-    {
+    public void calculateSpreadStatistics() throws Exception {
         if(values.containsKey(spreadMeanName)&&values.containsKey(spreadStandardDeviationName)) return ;
 
         List<Pair<Integer, Double>> logSpreadByTime =  simulation.getObservable(Observable.LOG_SPREAD);
@@ -45,7 +46,7 @@ public class StatisticsCalculator {
 
 
 
-    private void calculateLogReturnsStatistics() {
+    private void calculateLogReturnsStatistics() throws Exception {
         if(values.containsKey(logReturnsMeanName)&&values.containsKey(logReturnsStandardDeviationName)) return ;
 
         List<Pair<Integer, Double>> logReturnsByTime =  simulation.getObservable(Observable.LOG_RETURNS);
@@ -55,7 +56,7 @@ public class StatisticsCalculator {
 
     }
 
-    public static HashMap<String,Double> computeStatistics(List<Pair<Integer,Double>> timeSerie, int warmupRounds,String meanName, String standardDeviationName) {
+    public static HashMap<String,Double> computeStatistics(List<Pair<Integer,Double>> timeSerie, int warmupRounds,String meanName, String standardDeviationName) throws Exception {
 
         double sum = 0;
         double quadraticSum = 0;
@@ -69,17 +70,18 @@ public class StatisticsCalculator {
             quadraticSum = quadraticSum + Math.pow(value,2);
         }
 
-        double mean = sum/elements;
+        Double mean = sum/elements;
 
-        double standardDeviation = Math.sqrt(quadraticSum/elements-Math.pow(mean,2));
+        Double standardDeviation = Math.sqrt(quadraticSum/elements-Math.pow(mean,2));
 
+        if(mean.isNaN() || standardDeviation.isNaN()) throw new Exception("It was not possible to compute the statistics");
         HashMap<String, Double> output = new HashMap<>();
         output.put(meanName, mean);
         output.put(standardDeviationName, standardDeviation);
         return output;
 
     }
-    public double getSpreadMeanName() {
+    public double getSpreadMeanName() throws Exception {
 
         if(values.containsKey(spreadMeanName)) return values.get(spreadMeanName);
 
@@ -89,7 +91,7 @@ public class StatisticsCalculator {
 
 
 
-    public double getSpreadStandardDeviation() {
+    public double getSpreadStandardDeviation()  throws Exception {
         if(values.containsKey(spreadStandardDeviationName)) return values.get(spreadStandardDeviationName);
 
         calculateSpreadStatistics();
@@ -101,13 +103,13 @@ public class StatisticsCalculator {
         return 0;
     }
 
-    public double getLogReturnsMean() {
+    public double getLogReturnsMean()  throws Exception  {
         if(values.containsKey(logReturnsMeanName)) return values.get(logReturnsMeanName);
 
         calculateLogReturnsStatistics();
         return values.get(logReturnsMeanName);
     }
-    public double getLogReturnsStandardDeviation()
+    public double getLogReturnsStandardDeviation()  throws Exception
     {
         if(values.containsKey(logReturnsStandardDeviationName)) return values.get(logReturnsStandardDeviationName);
 

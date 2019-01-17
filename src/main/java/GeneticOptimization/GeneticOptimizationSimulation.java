@@ -121,7 +121,7 @@ public class GeneticOptimizationSimulation implements Serializable{
         }
         Arrays.sort(fitnesses);
 
-        for(int i = 0; i< ELITE_SIZE; i++) {
+        for(int i = 0; bestChromosomes.size()<ELITE_SIZE; i++) {
             bestChromosomes.add(fitnesses[POPULATION_SIZE-i-1].getChromosome());
         }
     }
