@@ -7,7 +7,7 @@ public class Configuration
 {
     public static int ROUNDS = 50000;
 
-    public int NUMBER_OF_AGENTS = 70;
+    public int NUMBER_OF_AGENTS = 500;
     public int INITIAL_STOCKS = 50;
     public int INITIAL_CASH = 20000;
     public int INITIAL_PRICE = 500;
