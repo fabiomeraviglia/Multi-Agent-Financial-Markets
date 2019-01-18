@@ -13,7 +13,7 @@ public class Configuration
     public int INITIAL_PRICE = 500;
 
     public double ALPHA_FRACTION_COEFF=3.0/4.0;
-    public double R_COEFF = 2;
+    public double R_COEFF =2;
     public int M_COEFF = 5;
 
     public double REMOVE_BUY_ORDERS= 0.05;
@@ -21,8 +21,8 @@ public class Configuration
     public double SPOT_BUY=0.1;
     public double SPOT_SELL =0.1;
     public double LIMIT_BUY = 1.0;
-    public double LIMIT_SELL = 1.0;
-    public double IDLE =0.2;
+    public double LIMIT_SELL =1.0;
+    public double IDLE =0.2;//0.2;
 
     public Perception PERCEPTION = new InstantaneousPerception();
 
