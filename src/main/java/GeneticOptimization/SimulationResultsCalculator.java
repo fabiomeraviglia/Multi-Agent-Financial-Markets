@@ -12,7 +12,7 @@ class SimulationResultsCalculator {
         statisticsCalculator.calculateEverything();
 
         SimulationResults results = new SimulationResults();
-        results.SpreadMean = statisticsCalculator.getSpreadMeanName();
+        results.SpreadMean = statisticsCalculator.getSpreadMean();
         results.SpreadStandardDeviation = statisticsCalculator.getSpreadStandardDeviation();
         results.SpreadTails = statisticsCalculator.getSpreadTails();
         results.LogReturnsMean = statisticsCalculator.getLogReturnsMean();

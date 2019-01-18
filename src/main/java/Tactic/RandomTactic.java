@@ -1,16 +1,8 @@
 package Tactic;
 
-import Action.Action;
-import Action.NullAction;
-import Knowledge.Knowledge;
+import Action.*;
 import Knowledge.InstantaneousKnowledge;
-import Action.LimitBuyAction;
-import Action.LimitSellAction;
-import Action.SpotSellAction;
-import Action.SpotBuyAction;
-import Action.CancelLimitBuyOrdersAction;
-import Action.CancelLimitSellOrdersAction;
-import Main.Main;
+import Knowledge.Knowledge;
 import Offer.BuyOffer;
 import Offer.SellOffer;
 
@@ -21,7 +13,7 @@ import java.util.Random;
 
 public class RandomTactic extends Tactic
 {
-    private static final Random r = Main.r;
+    private static final Random r = new Random();
     public final double rCoeff;
     public final double mCoeff;
     public final double alphaFractionCoeff;
@@ -63,12 +55,13 @@ public class RandomTactic extends Tactic
         double x = 1 - r.nextDouble();
         if (0 < x && x <= alpha * Math.pow((double)bid, rCoeff + 1) / (rCoeff + 1))
         {
-            return (int)(Math.pow(x * (rCoeff + 1) / alpha, 1/(rCoeff+1)));
+            return Math.max((int)(Math.pow(x * (rCoeff + 1) / alpha, 1/(rCoeff+1))),1);
         }
         else
         {
-            return ask + (int)(Math.pow(-1.0, mCoeff) * Math.pow((mCoeff+1)/beta * (x - 1), 1/(mCoeff+1)));
+            return Math.max(ask + (int)(Math.pow(-1.0, mCoeff) * Math.pow((mCoeff+1)/beta * (x - 1), 1/(mCoeff+1))),1);
         }
+
     }
 
     private int generateRandomSellPrice(int ask, int bid)
@@ -90,7 +83,9 @@ public class RandomTactic extends Tactic
     private Action generateRandomLimitBuyAction(InstantaneousKnowledge knowledge) {
         int price = generateRandomBuyPrice(knowledge.askPrice, knowledge.bidPrice);
         if (price > knowledge.freeAssets.cash) { return new NullAction(knowledge.self); }
+
         int stocks = r.nextInt(knowledge.freeAssets.cash / price) + 1;
+
         return new LimitBuyAction(knowledge.self, stocks, price);
     }
 

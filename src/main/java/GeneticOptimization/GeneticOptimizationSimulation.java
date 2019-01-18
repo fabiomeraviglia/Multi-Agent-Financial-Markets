@@ -62,7 +62,8 @@ public class GeneticOptimizationSimulation implements Serializable{
         List<Chromosome> chromosomesToEvaluate = new ArrayList<>();
         for(Chromosome chromosome : chromosomes)
         {
-            if(!chromosomesFitness.containsKey(chromosome))
+            if(!chromosomesFitness.containsKey(chromosome) ||
+                    OptimizationManager.r.nextInt(10)==0)
             {
                 chromosomesToEvaluate.add(chromosome);
             }
@@ -91,6 +92,7 @@ public class GeneticOptimizationSimulation implements Serializable{
             this.chromosomesFitness.put(chromosomeFitness.getChromosome(), chromosomeFitness);
         }
     }
+
     private void addBestFitness() {
         double bestFitness = -1;
         for(Chromosome chromosome : chromosomes)
@@ -103,6 +105,7 @@ public class GeneticOptimizationSimulation implements Serializable{
         }
         bestFitnessForGenerations.add(bestFitness);
     }
+
     //select the chromosomes that will be reproduced and replaces the chromosomes in the array chromosomes
     //inserisce migliori in bestChromosomes
     private void selectionAndReproduction() {
@@ -241,7 +244,10 @@ public class GeneticOptimizationSimulation implements Serializable{
     private void createChromosomes() {
 
         chromosomes= new Chromosome[POPULATION_SIZE];
-        for(int i = 0; i< POPULATION_SIZE; i++)
+
+        chromosomes[0]=ChromosomeFactory.getDefaultChromosome(); //primo elemento ha valori di default
+
+        for(int i = 1; i< POPULATION_SIZE; i++)
         {
             chromosomes[i]=ChromosomeFactory.getRandomChromosome();
         }

@@ -8,7 +8,7 @@ public class MainTest {
         System.out.println("Starting geneticOptimization");
         optimizationManager.runOptimization(GeneticExperimentHyperparameters.getRunTime());
 
-        optimizationManager.loadPreviousRun("prova");
+      //  optimizationManager.loadPreviousRun("Configuration 20190118_103328.txt");
 
     }
 }

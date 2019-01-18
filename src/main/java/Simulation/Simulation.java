@@ -3,6 +3,8 @@ package Simulation;
 import Gui.Observable;
 import Offer.BuyOffer;
 import Offer.SellOffer;
+import Tactic.RandomTactic;
+import Tactic.Tactic;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -63,10 +65,22 @@ public class Simulation {
         // Agents MUST be the last thing to be initialized because they need to observe the rest of the environment
         // to generate their first knowledge.
         this.agents = new ArrayList<>();
+
+        Tactic tactic = new RandomTactic(configuration.ALPHA_FRACTION_COEFF,
+                configuration.R_COEFF,
+                (double)configuration.M_COEFF,
+                new RandomTactic.ActionChances(configuration.REMOVE_BUY_ORDERS,
+                        configuration.REMOVE_SELL_ORDERS,
+                        configuration.SPOT_BUY,
+                        configuration.SPOT_SELL,
+                        configuration.LIMIT_BUY,
+                        configuration.LIMIT_SELL,
+                        configuration.IDLE));
+
         for(int i = 0; i < this.configuration.NUMBER_OF_AGENTS; i++) {
             this.agents.add(new Agent.Builder(this)
                 .perception(configuration.PERCEPTION)
-                .tactic(configuration.TACTIC)
+                .tactic(tactic)
                 .assets(new Assets(configuration.INITIAL_CASH, configuration.INITIAL_STOCKS))
                 .build());
         }
@@ -160,7 +174,7 @@ public class Simulation {
             : configuration.INITIAL_PRICE;
         double secondLastMidPrice = 0.5 * (Math.log(secondLastAskPrice) + Math.log(secondLastBidPrice));
         double lastMidPrice = 0.5 * (Math.log(lastAskPrice) + Math.log(lastBidPrice));
-        s.add(new Pair<>(lastTime + 1, lastMidPrice - secondLastMidPrice));
+        s.add(new Pair<>(lastTime + 1, Math.abs( lastMidPrice - secondLastMidPrice)));
     }
 
     private void updateLogSpread(List<Pair<Integer, Double>> s)
