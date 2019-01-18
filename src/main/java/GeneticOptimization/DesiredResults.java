@@ -9,7 +9,7 @@ class DesiredResults extends SimulationResults {
         this.SpreadTails=0;
         this.LogReturnsMean=3.78e-4;
         this.LogReturnsStandardDeviation=5.77e-4;
-        this.LogReturnsTails=0;
+        this.LogReturnsTails=2.6;
     }
 
 }

@@ -131,16 +131,18 @@ public class StatisticsCalculator {
 
         Collections.sort(logReturns, Collections.reverseOrder());
 
-        List<Double> tailSublist = logReturns.subList(0, 1000);
+        List<Double> tailSublist = logReturns.subList(0, 1001);
 
         List<Double> logTail = tailSublist.stream().map(d ->d!=0? Math.log(d) : 0.0004).collect(Collectors.toList());
 
         Double sum = 0.0;
-        for(Double value : logTail) sum=sum+value;
+        for(int i=0;i<logTail.size()-1; i++) {
+            sum = sum + logTail.get(i);
+        }
 
-        Double average = sum/logTail.size();
+        Double average = sum/(logTail.size()-1);
 
-        Double tailIndex = 1/(average-logReturns.get(1000));
+        Double tailIndex = 1/(average-logTail.get(1000));
 
         values.put(logTailName, tailIndex);
         return tailIndex;
