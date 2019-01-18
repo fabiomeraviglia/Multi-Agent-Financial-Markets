@@ -13,19 +13,19 @@ import java.util.Random;
 class ChromosomeFactory {
 
     private static final Gene[] genes = {
-            new IntegerGene("NUMBER_OF_AGENTS", 50 ,15, 500),
-            new IntegerGene("INITIAL_STOCKS",50, 20, 200),
-            new IntegerGene("INITIAL_CASH", 20000,10000, 100000),
+            new IntegerGene("NUMBER_OF_AGENTS", 79 ,15, 100),
+            new IntegerGene("INITIAL_STOCKS",42, 20, 200),
+            new IntegerGene("INITIAL_CASH", 56000,10000, 200000),
             new IntegerGene("INITIAL_PRICE", 500 ,10, 1000),
-            new FloatingPointGene("ALPHA_FRACTION_COEFF", 0.75, 0.0, 1.0),
-            new FloatingPointGene("R_COEFF", 2.0,1.2, 8.0),
+            new FloatingPointGene("ALPHA_FRACTION_COEFF", 0.0842, 0.0, 1.0),
+            new FloatingPointGene("R_COEFF", 7.71,1.2, 16.0),
             new IntegerGene("M_COEFF", 5,2, 8),
-            new FloatingPointGene("REMOVE_BUY_ORDERS",0.05, 0.0, 0.5),
-            new FloatingPointGene("REMOVE_SELL_ORDERS",0.05, 0.0, 0.5),
+            new FloatingPointGene("REMOVE_BUY_ORDERS",0.115, 0.0, 0.5),
+            new FloatingPointGene("REMOVE_SELL_ORDERS",0.019, 0.0, 0.5),
             new FloatingPointGene("SPOT_BUY", 0.1,0.0, 0.9),
-            new FloatingPointGene("SPOT_SELL", 0.1,0.0, 0.9),
-            new FloatingPointGene("LIMIT_BUY", 1.0,0.3, 2.0),
-            new FloatingPointGene("LIMIT_SELL",1.0, 0.3, 2.0),
+            new FloatingPointGene("SPOT_SELL", 0.058,0.0, 0.9),
+            new FloatingPointGene("LIMIT_BUY", 1.328,0.3, 3.0),
+            new FloatingPointGene("LIMIT_SELL",1.504, 0.3, 3.0),
             new FloatingPointGene("IDLE", 0.2,0.0, 1.0),
             /* public double ALPHA_FRACTION_COEFF=3.0/4.0; 0-1
              public double R_COEFF = 2; 1.2-8

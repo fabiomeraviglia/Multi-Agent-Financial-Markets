@@ -5,8 +5,10 @@ import Simulation.Simulation;
 import javafx.util.Pair;
 import org.apache.commons.math3.exception.NullArgumentException;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StatisticsCalculator {
 
@@ -18,6 +20,7 @@ public class StatisticsCalculator {
     private String spreadStandardDeviationName = "SpreadStandardDeviation";
     private String logReturnsMeanName = "LogReturnsMean";
     private String logReturnsStandardDeviationName = "LogReturnsStandardDeviation";
+    private String logTailName = "LogTail";
 
     private Simulation simulation;
     public StatisticsCalculator(Simulation simulation) {
@@ -33,6 +36,7 @@ public class StatisticsCalculator {
     public void calculateEverything() throws Exception {
             calculateSpreadStatistics();
             calculateLogReturnsStatistics();
+            getLogReturnsTails();
     }
     public void calculateSpreadStatistics() throws Exception {
         if(values.containsKey(spreadMeanName)&&values.containsKey(spreadStandardDeviationName)) return ;
@@ -118,7 +122,30 @@ public class StatisticsCalculator {
     }
     public double getLogReturnsTails() {
 
-        return 0;
+        if(values.containsKey(logTailName)) return values.get(logTailName);
+        List<Pair<Integer, Double>> logReturnsByTime =  simulation.getObservable(Observable.LOG_RETURNS);
+
+        logReturnsByTime = logReturnsByTime.subList(WARMUP_ROUNDS_FOR_STATISTICS, logReturnsByTime.size());
+
+        List<Double> logReturns = logReturnsByTime.stream().map(Pair::getValue).collect(Collectors.toList());
+
+        Collections.sort(logReturns, Collections.reverseOrder());
+
+        List<Double> tailSublist = logReturns.subList(0, 1001);
+
+        List<Double> logTail = tailSublist.stream().map(d ->d!=0? Math.log(d) : 0.0004).collect(Collectors.toList());
+
+        Double sum = 0.0;
+        for(int i=0;i<logTail.size()-1; i++) {
+            sum = sum + logTail.get(i);
+        }
+
+        Double average = sum/(logTail.size()-1);
+
+        Double tailIndex = 1/(average-logTail.get(1000));
+
+        values.put(logTailName, tailIndex);
+        return tailIndex;
     }
 
     public void setWarmupRoundsNumber(int warmupRoundsForStatistics) {

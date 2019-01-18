@@ -45,7 +45,7 @@ public class Main
             System.out.println("Spread stdev= "+sc.getSpreadStandardDeviation());
             System.out.println("LogRet mean= "+sc.getLogReturnsMean());
             System.out.println("LogRet stdev= "+sc.getLogReturnsStandardDeviation());
-
+            System.out.println("LRTail = "+sc.getLogReturnsTails());
         }
         catch(Exception ex) {System.out.println("\nError in calculating statistics");}
 
