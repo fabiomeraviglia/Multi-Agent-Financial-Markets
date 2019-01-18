@@ -58,7 +58,7 @@ public class RandomTactic extends Tactic
     private int generateRandomBuyPrice(int ask, int bid)
     {
         double alpha = alphaFractionCoeff * (rCoeff + 1) / Math.pow(bid, rCoeff+1);
-        double beta = (mCoeff + 1) / Math.pow((double)(bid - ask), mCoeff + 1)
+        double beta = (mCoeff + 1) / Math.pow((double)(bid - ask != 0 ? bid - ask : 1), mCoeff + 1)
                     * (alpha * Math.pow((double)bid, rCoeff+1)/(rCoeff+1) - 1);
         double x = 1 - r.nextDouble();
         if (0 < x && x <= alpha * Math.pow((double)bid, rCoeff + 1) / (rCoeff + 1))
@@ -74,8 +74,8 @@ public class RandomTactic extends Tactic
     private int generateRandomSellPrice(int ask, int bid)
     {
         double alpha = alphaFractionCoeff * (rCoeff + 1) / Math.pow(bid, rCoeff+1);
-        double beta = (mCoeff + 1) / Math.pow((double)(bid - ask), mCoeff + 1)
-            * (alpha * Math.pow((double)bid, rCoeff+1)/(rCoeff+1) - 1);
+        double beta = (mCoeff + 1) / Math.pow((double)(bid - ask != 0 ? bid - ask : 1), mCoeff + 1)
+                    * (alpha * Math.pow((double)bid, rCoeff+1)/(rCoeff+1) - 1);
         double x = 1 - r.nextDouble();
         if (0 < x && x <= -beta / (mCoeff+1) * Math.pow((double)(bid - ask), mCoeff+1))
         {

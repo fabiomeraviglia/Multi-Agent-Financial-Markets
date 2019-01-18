@@ -12,9 +12,9 @@ import java.util.Random;
 class ChromosomeFactory {
 
         private static final Gene[] genes = {
-        new IntegerGene("NUMBER_OF_AGENTS",15,30),
-            new IntegerGene("INITIAL_STOCKS",1,1000),
-            new IntegerGene("INITIAL_CASH",100,10000),
+        new IntegerGene("NUMBER_OF_AGENTS",15,300),
+            new IntegerGene("INITIAL_STOCKS",10,1000),
+            new IntegerGene("INITIAL_CASH",100000,1000000),
             new IntegerGene("INITIAL_PRICE",10,1000),
            // new StringGene("TACTIC", new String[]{"RandomTactic","RandomLogTactic"})
     };
