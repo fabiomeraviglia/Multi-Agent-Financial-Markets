@@ -25,15 +25,14 @@ public class OptimizationManager {
 
             System.out.println("Starting new optimization run");
             optimizationSimulation.runOptimization(executionTimeLeft(initialTime,maxExecutionTimeMillis));
-            ChromosomeFitness bestChromosome = optimizationSimulation.getBestChromosomeFitness();
-
-            bestChromosomes.add(bestChromosome);
+            addBestChromosome();
+            saveBest();
+            System.out.println("Saved best chromosomes");
 
             if(executionTimeLeft(initialTime,maxExecutionTimeMillis)>0)
             {
                 System.out.println("Execution time left "+executionTimeLeft(initialTime,maxExecutionTimeMillis)/1000 + "seconds");
-                saveBest();
-                System.out.println("Saved best chromosomes");
+
             }
             else
             {
@@ -43,6 +42,11 @@ public class OptimizationManager {
 
             optimizationSimulation = new GeneticOptimizationSimulation();
         }
+    }
+    private void addBestChromosome()
+    {
+        ChromosomeFitness bestChromosome = optimizationSimulation.getBestChromosomeFitness();
+        bestChromosomes.add(bestChromosome);
     }
     public void loadPreviousRun(String fileName)
     {

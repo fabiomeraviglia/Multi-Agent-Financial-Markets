@@ -13,10 +13,13 @@ public class FloatingPointGene extends Gene<Double> {
         this.minValue=minValue;
         this.maxValue=maxValue;
     }
-    private FloatingPointGene(String name, Double value, Double minValue, Double maxValue)
+    public FloatingPointGene(String name, Double value, Double minValue, Double maxValue)
     {
         super(name,value);
         if(minValue>maxValue) throw  new IllegalArgumentException();
+        if(minValue>value) throw  new IllegalArgumentException();
+
+        if(maxValue<value) throw  new IllegalArgumentException();
         this.minValue=minValue;
         this.maxValue=maxValue;
     }
@@ -45,6 +48,7 @@ public class FloatingPointGene extends Gene<Double> {
 
         return  new FloatingPointGene(getName(),value, minValue,maxValue );
     }
+
 
 
     @Override

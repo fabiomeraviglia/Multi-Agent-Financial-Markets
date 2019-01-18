@@ -10,12 +10,16 @@ public class IntegerGene extends Gene<Integer>{
     public IntegerGene(String name, Integer minValue, Integer maxValue)
     {
         super(name,minValue);
+        if(minValue>maxValue) throw  new IllegalArgumentException();
         this.minValue= minValue;
         this.maxValue = maxValue;
     }
-    private IntegerGene(String name, Integer value, Integer minValue, Integer maxValue)
+    public IntegerGene(String name, Integer value, Integer minValue, Integer maxValue)
     {
         super(name,value);
+        if(minValue>maxValue) throw  new IllegalArgumentException();
+        if(minValue>value) throw  new IllegalArgumentException();
+        if(maxValue<value) throw  new IllegalArgumentException();
         this.minValue= minValue;
         this.maxValue = maxValue;
     }

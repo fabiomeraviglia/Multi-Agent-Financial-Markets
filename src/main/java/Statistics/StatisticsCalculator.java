@@ -81,7 +81,7 @@ public class StatisticsCalculator {
         return output;
 
     }
-    public double getSpreadMeanName() throws Exception {
+    public double getSpreadMean() throws Exception {
 
         if(values.containsKey(spreadMeanName)) return values.get(spreadMeanName);
 

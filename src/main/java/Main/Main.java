@@ -4,13 +4,10 @@ import Gui.Observable;
 import Gui.PlotManager;
 import Simulation.Configuration;
 import Simulation.Simulation;
-
-import java.util.Random;
+import Statistics.StatisticsCalculator;
 
 public class Main
 {
-  public static Random r = new Random();
-
 
 
   public static void main(String[] args)
@@ -33,12 +30,27 @@ public class Main
           sim.getOrdersBook().getCurrentAskPrice(),
           sim.getOrdersBook().getTransactions().size());
       sim.nextTurn();
+
       if (i % Configuration.ROUNDS_TO_PLOT == 0) {
         for(Observable o : PlotManager.watchedObservables)
         {
           pm.updatePlot(o, sim.getObservables().get(o));
         }
+        try {
+
+            StatisticsCalculator sc = new StatisticsCalculator(sim);
+            sc.setWarmupRoundsNumber(5000);
+            sc.calculateEverything();
+            System.out.println("\nSpread mean= "+sc.getSpreadMean());
+            System.out.println("Spread stdev= "+sc.getSpreadStandardDeviation());
+            System.out.println("LogRet mean= "+sc.getLogReturnsMean());
+            System.out.println("LogRet stdev= "+sc.getLogReturnsStandardDeviation());
+
+        }
+        catch(Exception ex) {System.out.println("\nError in calculating statistics");}
+
       }
+
     }
     sim.nextTurn(); // for debugging purpose: add a last round for easy breakpoint
     System.out.printf("\n");
