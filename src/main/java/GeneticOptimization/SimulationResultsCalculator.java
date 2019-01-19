@@ -3,7 +3,7 @@ package GeneticOptimization;
 import Simulation.Simulation;
 import Statistics.StatisticsCalculator;
 
-class SimulationResultsCalculator {
+public class SimulationResultsCalculator {
 
     public static SimulationResults calculateResult(Simulation simulation) throws Exception {
 

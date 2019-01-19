@@ -1,11 +1,13 @@
 package Main;
 
+import GeneticOptimization.FitnessCalculator;
+import GeneticOptimization.SimulationResults;
+import GeneticOptimization.SimulationResultsCalculator;
 import Gui.Observable;
 import Gui.PlotManager;
 import Simulation.Configuration;
 import Simulation.Simulation;
 import Statistics.StatisticsCalculator;
-
 public class Main
 {
 
@@ -41,11 +43,16 @@ public class Main
             StatisticsCalculator sc = new StatisticsCalculator(sim);
             sc.setWarmupRoundsNumber(10000);
             sc.calculateEverything();
+
+            SimulationResults res = SimulationResultsCalculator.calculateResult(sim);
+
             System.out.println("\nSpread mean= "+sc.getSpreadMean());
             System.out.println("Spread stdev= "+sc.getSpreadStandardDeviation());
             System.out.println("LogRet mean= "+sc.getLogReturnsMean());
             System.out.println("LogRet stdev= "+sc.getLogReturnsStandardDeviation());
             System.out.println("LRTail = "+sc.getLogReturnsTails());
+            System.out.println("Fitness = " +FitnessCalculator.getFitness(res));
+
         }
         catch(Exception ex) {System.out.println("\nError in calculating statistics");}
 

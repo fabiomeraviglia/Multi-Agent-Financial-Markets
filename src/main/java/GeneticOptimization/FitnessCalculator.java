@@ -1,6 +1,6 @@
 package GeneticOptimization;
 
-class FitnessCalculator {
+public class FitnessCalculator {
 
     private static final SimulationResults desiredResults = new DesiredResults();
 

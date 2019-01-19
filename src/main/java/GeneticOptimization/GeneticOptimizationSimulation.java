@@ -234,7 +234,7 @@ public class GeneticOptimizationSimulation implements Serializable{
             for(Gene gene : chromosomes[i]) {
 
                 if (OptimizationManager.r.nextDouble() < MUTATION_RATE) {
-                    gene = gene.getMutation();
+                    gene = gene.getMutation(Math.min(0.75,1.4/Math.log(2+(double)generationNumber)));
                 }
                 newGenes.add(gene);
             }

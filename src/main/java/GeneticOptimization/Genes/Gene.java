@@ -19,7 +19,16 @@ public abstract class Gene<T> implements Cloneable, Serializable {
         return value;
     }
     final String getName() {return  name; }
-    public abstract Gene<T> getMutation();
+
+    /**
+     *
+     * @param variationMagnitude
+     * A number between 0 and 1, where 0 means the variation will always be small, and 1 that will be big.
+     * So it represents the probability of having a big variation
+     * @return
+     */
+    public abstract Gene<T> getMutation(Double variationMagnitude);
+
     public abstract Gene<T> getRandomGene();
     @Override
     public final boolean equals(Object o) {
