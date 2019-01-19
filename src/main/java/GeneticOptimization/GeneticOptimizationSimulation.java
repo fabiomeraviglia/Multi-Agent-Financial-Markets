@@ -10,6 +10,8 @@ public class GeneticOptimizationSimulation implements Serializable{
     private static final long serialVersionUID = 127988556026189305L;
     private Chromosome[] chromosomes; // the cromosomes for the current generation, n = POPULATION_SIZE
     private final HashMap<Chromosome,ChromosomeFitness> chromosomesFitness = new HashMap<>();//store the fitness for every chromosome ever computed
+    private final HashMap<Chromosome,Integer> timesComputed = new HashMap<>();//store how many times the value was computed
+
     private final HashSet<Chromosome> bestChromosomes = new HashSet<>();//the n best chromosomes for the current generation, where n = ELITE_SIZE
     private final List<Double> bestFitnessForGenerations = new ArrayList<>();//store the best fitness for every generation; length = number of generations
     private final double MUTATION_RATE=GeneticExperimentHyperparameters.MUTATION_RATE;
@@ -59,16 +61,17 @@ public class GeneticOptimizationSimulation implements Serializable{
     //valuta i chromosome presenti nella lista chromosomes e aggiunge il loro fitness nella map chromosomeFitness
     //aggiunge un valore ad bestFitnessForGeneration
     private void evaluation() {
-        List<Chromosome> chromosomesToEvaluate = new ArrayList<>();
+        HashSet<Chromosome> chromosomesToEvaluate = new HashSet<>();
         for(Chromosome chromosome : chromosomes)
         {
             if(!chromosomesFitness.containsKey(chromosome) ||
+                    bestChromosomes.contains(chromosome) ||
                     OptimizationManager.r.nextInt(10)==0)
             {
                 chromosomesToEvaluate.add(chromosome);
             }
         }
-        computeFitness(chromosomesToEvaluate);
+        computeFitness(new ArrayList<>(chromosomesToEvaluate));
 
         addBestFitness();
         addBestToBestChromosomesMap();
@@ -87,10 +90,38 @@ public class GeneticOptimizationSimulation implements Serializable{
         simulationManager.runSimulations();
 
         ChromosomeFitness[] chromosomeFitnesses = simulationManager.getSimulationResults();
-        for(ChromosomeFitness chromosomeFitness: chromosomeFitnesses)
+        for(ChromosomeFitness chromosomeFitness : chromosomeFitnesses)
         {
-            this.chromosomesFitness.put(chromosomeFitness.getChromosome(), chromosomeFitness);
+            addToComputedFitnessMap(chromosomeFitness);
         }
+    }
+
+    private void addToComputedFitnessMap(ChromosomeFitness chromosomeFitness) {
+
+        Chromosome chromosome = chromosomeFitness.getChromosome();
+
+        if(!timesComputed.containsKey(chromosome))
+        {
+            timesComputed.put(chromosome,1);
+            this.chromosomesFitness.put(chromosome, chromosomeFitness);
+        }
+        else
+        {
+            Double newFitness = chromosomeFitness.getFitness();
+            Double alreadyComputedFitness = this.chromosomesFitness.get(chromosome).getFitness();
+            double n = (double)timesComputed.get(chromosome);
+
+            Double averageFitness = (n*alreadyComputedFitness+newFitness)/(n+1);
+            ChromosomeFitness newChromosomeFitness = new ChromosomeFitness(chromosome,averageFitness);
+
+            this.chromosomesFitness.put(chromosome, newChromosomeFitness);
+
+            timesComputed.put(chromosome,(int)n+1);
+
+            System.out.println("Updating value "+alreadyComputedFitness+ " with "+averageFitness +" for the "+n+" time. Just computed:"+newFitness);
+
+        }
+
     }
 
     private void addBestFitness() {

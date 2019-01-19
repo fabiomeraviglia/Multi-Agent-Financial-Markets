@@ -102,11 +102,6 @@ public class StatisticsCalculator {
         return values.get(spreadMeanName);
     }
 
-    public double getSpreadTails() {
-
-        return 0;
-    }
-
     public double getLogReturnsMean()  throws Exception  {
         if(values.containsKey(logReturnsMeanName)) return values.get(logReturnsMeanName);
 

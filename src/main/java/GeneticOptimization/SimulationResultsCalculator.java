@@ -14,7 +14,7 @@ class SimulationResultsCalculator {
         SimulationResults results = new SimulationResults();
         results.SpreadMean = statisticsCalculator.getSpreadMean();
         results.SpreadStandardDeviation = statisticsCalculator.getSpreadStandardDeviation();
-        results.SpreadTails = statisticsCalculator.getSpreadTails();
+
         results.LogReturnsMean = statisticsCalculator.getLogReturnsMean();
         results.LogReturnsStandardDeviation = statisticsCalculator.getLogReturnsStandardDeviation();
         results.LogReturnsTails = statisticsCalculator.getLogReturnsTails();

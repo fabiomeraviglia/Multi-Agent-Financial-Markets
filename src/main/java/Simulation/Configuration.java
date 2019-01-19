@@ -5,7 +5,7 @@ import Perception.Perception;
 
 public class Configuration
 {
-    public static int ROUNDS = 50000;
+    public static int ROUNDS = 42000;
 
     public int NUMBER_OF_AGENTS = 79;//70;
     public int INITIAL_STOCKS = 42;//50;

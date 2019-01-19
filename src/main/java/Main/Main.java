@@ -39,7 +39,7 @@ public class Main
         try {
 
             StatisticsCalculator sc = new StatisticsCalculator(sim);
-            sc.setWarmupRoundsNumber(5000);
+            sc.setWarmupRoundsNumber(10000);
             sc.calculateEverything();
             System.out.println("\nSpread mean= "+sc.getSpreadMean());
             System.out.println("Spread stdev= "+sc.getSpreadStandardDeviation());
