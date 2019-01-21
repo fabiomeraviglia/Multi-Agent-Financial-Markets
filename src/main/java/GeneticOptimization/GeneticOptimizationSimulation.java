@@ -3,7 +3,10 @@ package GeneticOptimization;
 import GeneticOptimization.Genes.Gene;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class GeneticOptimizationSimulation implements Serializable{
 
@@ -11,7 +14,7 @@ public class GeneticOptimizationSimulation implements Serializable{
     private Chromosome[] chromosomes; // the cromosomes for the current generation, n = POPULATION_SIZE
     private final HashMap<Chromosome,ChromosomeFitness> chromosomesFitness = new HashMap<>();//store the fitness for every chromosome ever computed
     private final HashMap<Chromosome,Integer> timesComputed = new HashMap<>();//store how many times the value was computed
-
+    
     private final HashSet<Chromosome> bestChromosomes = new HashSet<>();//the n best chromosomes for the current generation, where n = ELITE_SIZE
     private final List<Double> bestFitnessForGenerations = new ArrayList<>();//store the best fitness for every generation; length = number of generations
     private final double MUTATION_RATE=GeneticExperimentHyperparameters.MUTATION_RATE;
@@ -21,6 +24,10 @@ public class GeneticOptimizationSimulation implements Serializable{
 
     private final int ELITE_SIZE = getEliteSize();
     private int generationNumber = 1;
+    private  double lastTurnRelativeError = 0.01;
+    
+    
+    
     public GeneticOptimizationSimulation()
     {
         this.createChromosomes();
@@ -40,10 +47,16 @@ public class GeneticOptimizationSimulation implements Serializable{
             mutation();
             evaluation();
             generationNumber++;
+            
+            //sleep();
         }
     }
     private void print()
     {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	Date date = new Date();
+	System.out.println(dateFormat.format(date));
+        
         System.out.print("Executing generation number "+generationNumber);
 
         System.out.println(" Current best fitness = "+ getBestChromosomeFitness().getFitness());
@@ -65,27 +78,43 @@ public class GeneticOptimizationSimulation implements Serializable{
         for(Chromosome chromosome : chromosomes)
         {
             if(!chromosomesFitness.containsKey(chromosome) ||
-                    bestChromosomes.contains(chromosome) ||
-                    OptimizationManager.r.nextInt(10)==0)
+                    bestChromosomes.contains(chromosome))
             {
-                chromosomesToEvaluate.add(chromosome);
+                    chromosomesToEvaluate.add(chromosome);
             }
         }
+        
         computeFitness(new ArrayList<>(chromosomesToEvaluate));
 
         addBestFitness();
         addBestToBestChromosomesMap();
 
     }
-
+    private int timesToEvaluate() {
+        //Se tra una valutazione e l'altra cambia molto il valore della fitness significa che serve fare la media tra molte valutazioni 
+        if(lastTurnRelativeError < 0.05) return 1;
+        if(lastTurnRelativeError < 0.10) return 2;
+        if(lastTurnRelativeError < 0.15) return 3;
+        if(lastTurnRelativeError < 0.20) return 4;
+        return 5;
+    }
     private void computeFitness(List<Chromosome> chromosomes) {
 
-        if(chromosomes.size()==0)
+        if(chromosomes.isEmpty())
             return;
 
-        Chromosome[] chromosomesArray = new Chromosome[chromosomes.size()];
-        chromosomesArray= chromosomes.toArray(chromosomesArray);
-
+        int timesToBeEvaluated = timesToEvaluate();
+        System.out.println("Chromosomes to be evaluated:"+chromosomes.size()+" "+"Times to be evaluated: "+timesToBeEvaluated);
+        Chromosome[] chromosomesArray = new Chromosome[chromosomes.size()*timesToBeEvaluated];
+        
+        for(int i = 0; i<chromosomes.size();i++)
+        {
+            for(int j=0;j<timesToBeEvaluated;j++)
+            {
+                chromosomesArray[i*timesToBeEvaluated+j]= chromosomes.get(i);
+            }
+        }
+        
         SimulationManager simulationManager = new SimulationManager(chromosomesArray);
         simulationManager.runSimulations();
 
@@ -117,8 +146,15 @@ public class GeneticOptimizationSimulation implements Serializable{
             this.chromosomesFitness.put(chromosome, newChromosomeFitness);
 
             timesComputed.put(chromosome,(int)n+1);
-
-            System.out.println("Updating value "+alreadyComputedFitness+ " with "+averageFitness +" for the "+n+" time. Just computed:"+newFitness);
+            
+            if(n==1 && newFitness>0.0)
+            {//se Ë la prima volta che aggiorno il valore, calcolo qual Ë l'errore relativo tra la vecchia misura e quella nuova
+                     double relativeError = Math.abs(newFitness-alreadyComputedFitness)/Math.max(newFitness,alreadyComputedFitness);
+                    
+                     int slowDownFactor = ELITE_SIZE+ POPULATION_SIZE/10;
+                     lastTurnRelativeError = (lastTurnRelativeError * slowDownFactor + relativeError)/(slowDownFactor+1);
+            }
+            System.out.println("Updating value "+alreadyComputedFitness+ " with "+averageFitness +" for the "+n+" time. Just computed:"+newFitness+" RelErr="+lastTurnRelativeError);
 
         }
 
@@ -228,17 +264,23 @@ public class GeneticOptimizationSimulation implements Serializable{
 
     //per ogni chromosome non presente in bestChromosomes per ogni gene effettua una mutazione con probabilit√† MUTATION_RATE
     private void mutation() {
+        
         for(int i=ELITE_SIZE;i<POPULATION_SIZE;i++)
         {
             List<Gene> newGenes = new ArrayList<>();
+            int mutationCount = 0;
             for(Gene gene : chromosomes[i]) {
 
                 if (OptimizationManager.r.nextDouble() < MUTATION_RATE) {
                     gene = gene.getMutation(Math.min(0.75,1.4/Math.log(2+(double)generationNumber)));
+                    mutationCount++;
                 }
                 newGenes.add(gene);
             }
-            chromosomes[i]=new Chromosome(newGenes,chromosomes[i].getName()+"M");
+            
+            String name = chromosomes[i].getName();
+            if(mutationCount > 0) name = name+"M";
+            chromosomes[i]=new Chromosome(newGenes,name);
         }
     }
 
@@ -276,9 +318,9 @@ public class GeneticOptimizationSimulation implements Serializable{
 
         chromosomes= new Chromosome[POPULATION_SIZE];
 
-        chromosomes[0]=ChromosomeFactory.getDefaultChromosome(); //primo elemento ha valori di default
+       // chromosomes[0]=ChromosomeFactory.getDefaultChromosome(); //primo elemento ha valori di default
 
-        for(int i = 1; i< POPULATION_SIZE; i++)
+        for(int i = 0; i< POPULATION_SIZE; i++)
         {
             chromosomes[i]=ChromosomeFactory.getRandomChromosome();
         }
@@ -304,4 +346,16 @@ public class GeneticOptimizationSimulation implements Serializable{
         if(size<=0) size =1;
         return size;
     }
+
+    private void sleep() {
+                
+            if((System.currentTimeMillis()/(1000*60*3))%3==2)
+            {
+                System.out.println("Going to sleep");
+                try {TimeUnit.MINUTES.sleep(3);} catch(InterruptedException e){System.out.println("Exception while sleeping: "+e.toString()+ e.getMessage());}
+;
+            }
+    }
+
+
 }
