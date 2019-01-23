@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018/W32TeX) (preloaded format=pdflatex 2018.12.5)  12 JAN 2019 19:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018/W32TeX) (preloaded format=pdflatex 2018.12.5)  18 JAN 2019 17:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -680,27 +680,26 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 97.
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 10.07397pt on input line 104.
+(Font)              scaled to size 10.07397pt on input line 115.
 LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 7.63599pt on input line 104.
+(Font)              scaled to size 7.63599pt on input line 115.
 LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 5.51999pt on input line 104.
+(Font)              scaled to size 5.51999pt on input line 115.
 LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 10.07397pt on input line 104.
+(Font)              scaled to size 10.07397pt on input line 115.
 LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 7.63599pt on input line 104.
+(Font)              scaled to size 7.63599pt on input line 115.
 LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 5.51999pt on input line 104.
+(Font)              scaled to size 5.51999pt on input line 115.
+ [1
 
-Underfull \hbox (badness 10000) in paragraph at lines 125--126
+
+{d:/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+Underfull \hbox (badness 10000) in paragraph at lines 136--137
 
  []
 
-[1
-
-
-{d:/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3]
-(./ADAFMarket.aux) ) 
+[2] [3] (./ADAFMarket.aux) ) 
 Here is how much of TeX's memory you used:
  6443 strings out of 492639
  100103 string characters out of 6133088
@@ -709,14 +708,14 @@ Here is how much of TeX's memory you used:
  91666 words of font info for 109 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  51i,26n,51p,9089b,258s stack positions out of 5000i,500n,10000p,200000b,80000s
-{d:/texlive/2018/texmf-dist/fonts/enc/dvips/base/8r.enc}<d:
-/texlive/2018/texmf-dist/fonts/type1/public/fourier/fourier-mcl.pfb><d:/texlive
-/2018/texmf-dist/fonts/type1/public/fourier/fourier-mex.pfb><d:/texlive/2018/te
-xmf-dist/fonts/type1/public/fourier/fourier-mlit.pfb><d:/texlive/2018/texmf-dis
-t/fonts/type1/public/fourier/fourier-ms.pfb><d:/texlive/2018/texmf-dist/fonts/t
-ype1/adobe/utopia/putr8a.pfb><d:/texlive/2018/texmf-dist/fonts/type1/adobe/utop
-ia/putri8a.pfb>
-Output written on ADAFMarket.pdf (3 pages, 51052 bytes).
+{d:/texlive/2018/texmf-dist/fonts/enc/dvips/base/8r
+.enc}<d:/texlive/2018/texmf-dist/fonts/type1/public/fourier/fourier-mcl.pfb><d:
+/texlive/2018/texmf-dist/fonts/type1/public/fourier/fourier-mex.pfb><d:/texlive
+/2018/texmf-dist/fonts/type1/public/fourier/fourier-mlit.pfb><d:/texlive/2018/t
+exmf-dist/fonts/type1/public/fourier/fourier-ms.pfb><d:/texlive/2018/texmf-dist
+/fonts/type1/adobe/utopia/putr8a.pfb><d:/texlive/2018/texmf-dist/fonts/type1/ad
+obe/utopia/putri8a.pfb>
+Output written on ADAFMarket.pdf (3 pages, 51341 bytes).
 PDF statistics:
  39 PDF objects out of 1000 (max. 8388607)
  27 compressed objects within 1 object stream
