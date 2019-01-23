@@ -24,14 +24,14 @@ public class FloatingPointGene extends Gene<Double> {
         this.maxValue=maxValue;
     }
     @Override
-    public Gene<Double> getMutation()
+    public Gene<Double> getMutation(Double variationMagnitude)
     {
-
-        if(OptimizationManager.r.nextDouble()<0.5) {
+        if(variationMagnitude>1 || variationMagnitude<0) throw new RuntimeException("Illegal variation magnitude");
+        if(OptimizationManager.r.nextDouble()>=variationMagnitude) {
 
             double distanceFromBorder = Math.min(maxValue-getValue(), getValue()-minValue);
 
-            double variation = (OptimizationManager.r.nextGaussian()*distanceFromBorder)/3;
+            double variation = (variationMagnitude+0.2)*(OptimizationManager.r.nextGaussian()*distanceFromBorder)/2;
 
             double value = getValue()+variation;
             if(value<minValue) value= minValue;

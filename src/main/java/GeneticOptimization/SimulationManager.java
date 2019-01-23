@@ -20,7 +20,6 @@ class SimulationManager  {
 
         SimulationExecutor[] simulationExecutors = getSimulationExecutors();
 
-
         ExecutorService executor = Executors.newFixedThreadPool(simulationExecutors.length);
 
         for (SimulationExecutor simulationExecutor : simulationExecutors) {

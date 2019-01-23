@@ -13,20 +13,20 @@ import java.util.Random;
 class ChromosomeFactory {
 
     private static final Gene[] genes = {
-            new IntegerGene("NUMBER_OF_AGENTS", 79 ,15, 100),
-            new IntegerGene("INITIAL_STOCKS",42, 20, 200),
-            new IntegerGene("INITIAL_CASH", 56000,10000, 200000),
-            new IntegerGene("INITIAL_PRICE", 500 ,10, 1000),
-            new FloatingPointGene("ALPHA_FRACTION_COEFF", 0.0842, 0.0, 1.0),
-            new FloatingPointGene("R_COEFF", 7.71,1.2, 16.0),
-            new IntegerGene("M_COEFF", 5,2, 8),
-            new FloatingPointGene("REMOVE_BUY_ORDERS",0.115, 0.0, 0.5),
-            new FloatingPointGene("REMOVE_SELL_ORDERS",0.019, 0.0, 0.5),
-            new FloatingPointGene("SPOT_BUY", 0.1,0.0, 0.9),
-            new FloatingPointGene("SPOT_SELL", 0.058,0.0, 0.9),
-            new FloatingPointGene("LIMIT_BUY", 1.328,0.3, 3.0),
-            new FloatingPointGene("LIMIT_SELL",1.504, 0.3, 3.0),
-            new FloatingPointGene("IDLE", 0.2,0.0, 1.0),
+            new IntegerGene("NUMBER_OF_AGENTS", 26 ,15, 300),
+            new IntegerGene("INITIAL_STOCKS",37, 10, 200),
+            new IntegerGene("INITIAL_CASH", 173337,10000, 900000),
+            new IntegerGene("INITIAL_PRICE", 507 ,10, 1000),
+            new FloatingPointGene("ALPHA_FRACTION_COEFF", 0.0342411, 0.0, 1.0),
+            new FloatingPointGene("R_COEFF", 12.3,1.2, 24.0),
+            new IntegerGene("M_COEFF", 3,2, 8),
+            new FloatingPointGene("REMOVE_BUY_ORDERS",0.1665, 0.0, 0.8),
+            new FloatingPointGene("REMOVE_SELL_ORDERS",0.019, 0.0, 0.8),
+            new FloatingPointGene("SPOT_BUY", 0.175,0.0, 0.9),
+            new FloatingPointGene("SPOT_SELL", 0.277,0.0, 0.9),
+            new FloatingPointGene("LIMIT_BUY", 2.16,0.3, 10.0),
+            new FloatingPointGene("LIMIT_SELL",2.68, 0.3, 10.0),
+            new FloatingPointGene("IDLE", 0.111,0.0, 0.2),
             /* public double ALPHA_FRACTION_COEFF=3.0/4.0; 0-1
              public double R_COEFF = 2; 1.2-8
              public int M_COEFF = 5; 2-8

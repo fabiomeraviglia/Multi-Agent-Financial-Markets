@@ -16,7 +16,7 @@ public class StringGene extends Gene<String> {
         this.range=range;
     }
     @Override
-    public Gene<String> getMutation() {
+    public Gene<String> getMutation(Double variationMagnitude) {
 
         return getRandomGene();
     }
