@@ -1,14 +1,14 @@
 package Action;
 
-import Simulation.Simulation;
 import Simulation.Agent;
+import Simulation.Simulation;
 
 public class LimitBuyAction extends Action
 {
-    public final int stockQuantity;
-    public final int price;
+    public final long stockQuantity;
+    public final long price;
 
-    public LimitBuyAction(Agent performer, int stockQuantity, int price) {
+    public LimitBuyAction(Agent performer, long stockQuantity, long price) {
         super(performer);
         this.stockQuantity = stockQuantity;
         this.price = price;

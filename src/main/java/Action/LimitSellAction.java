@@ -5,10 +5,10 @@ import Simulation.Simulation;
 
 public class LimitSellAction extends Action
 {
-    public final int stockQuantity;
-    public final int price;
+    public final long stockQuantity;
+    public final long price;
 
-    public LimitSellAction(Agent performer, int stockQuantity, int price) {
+    public LimitSellAction(Agent performer, long stockQuantity, long price) {
         super(performer);
         this.stockQuantity = stockQuantity;
         this.price = price;

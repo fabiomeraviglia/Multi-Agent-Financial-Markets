@@ -59,7 +59,7 @@ public class PlotManager
         }
     }
 
-    public void updatePlot(Observable o, List<Pair<Integer,Double>> newData)
+    public void updatePlot(Observable o, List<Pair<Long,Double>> newData)
     {
         plots.get(o).updateChart(newData);
     }

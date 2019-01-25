@@ -1,9 +1,9 @@
 package Simulation;
 
 import Action.Action;
-import Tactic.Tactic;
 import Knowledge.Knowledge;
 import Perception.Perception;
+import Tactic.Tactic;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -38,7 +38,7 @@ public class Agent {
     public Assets getOfferedAssets() { return offeredAssets; }
     public Assets getTotalAssets() { return totalAssets; }
 
-    public void modifyFreeCash(int quantity) {
+    public void modifyFreeCash(long quantity) {
         if (-quantity > this.freeAssets.cash) {
             throw new RuntimeException("Tried to remove more cash than available cash from agent.");
         }
@@ -46,7 +46,7 @@ public class Agent {
         this.totalAssets = this.totalAssets.add(quantity, 0);
     }
 
-    public void modifyOfferedCash(int quantity) {
+    public void modifyOfferedCash(long quantity) {
         if (-quantity > this.offeredAssets.cash) {
             throw new RuntimeException("Tried to remove more cash than available cash from agent.");
         }
@@ -54,7 +54,7 @@ public class Agent {
         this.totalAssets = this.totalAssets.add(quantity, 0);
     }
 
-    public void modifyFreeStocks(int quantity) {
+    public void modifyFreeStocks(long quantity) {
         if (-quantity > this.freeAssets.stocks) {
             throw new RuntimeException("Tried to remove more stocks than available stocks from agent.");
         }
@@ -62,7 +62,7 @@ public class Agent {
         this.totalAssets = this.totalAssets.add(0, quantity);
     }
 
-    public void modifyOfferedStocks(int quantity) {
+    public void modifyOfferedStocks(long quantity) {
         if (-quantity > this.offeredAssets.stocks) {
             throw new RuntimeException("Tried to remove more stocks than available stocks from agent.");
         }
@@ -73,9 +73,9 @@ public class Agent {
     @Override
     public String toString() {
         return super.toString()
-            + ". Free assets: [" + freeAssets.toString() + "]"
-            + "; Offered assets: [" + offeredAssets.toString() + "]"
-            + "; Total Asset: [" + totalAssets.toString() + "]";
+                + ". Free assets: [" + freeAssets.toString() + "]"
+                + "; Offered assets: [" + offeredAssets.toString() + "]"
+                + "; Total Asset: [" + totalAssets.toString() + "]";
     }
 
     public static class Builder {

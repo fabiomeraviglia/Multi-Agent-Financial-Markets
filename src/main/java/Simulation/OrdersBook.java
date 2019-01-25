@@ -1,16 +1,9 @@
 package Simulation;
 
 import Offer.BuyOffer;
-import Offer.Offer;
 import Offer.SellOffer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class OrdersBook {
 
@@ -19,13 +12,13 @@ public class OrdersBook {
     private List<Transaction> transactions;
     private Map<Agent, Set<BuyOffer>> buyers;
     private Map<Agent, Set<SellOffer>> sellers;
-    private int currentBidPrice;
-    private int currentAskPrice;
+    private long  currentBidPrice;
+    private long  currentAskPrice;
 
     public void clearTransactions() { transactions.clear();}
 
     public OrdersBook() { this(1,1); }
-    public OrdersBook(int initialBid, int initialAsk)
+    public OrdersBook(long  initialBid, long  initialAsk)
     {
         buyOrders = new PriorityQueue<>(new BuyOffer.BidComparator());
         sellOrders = new PriorityQueue<>(new SellOffer.AskComparator());
@@ -36,8 +29,8 @@ public class OrdersBook {
         this.currentBidPrice = initialBid;
     }
 
-    public int getCurrentBidPrice() { return currentBidPrice; }
-    public int getCurrentAskPrice() { return currentAskPrice; }
+    public long  getCurrentBidPrice() { return currentBidPrice; }
+    public long  getCurrentAskPrice() { return currentAskPrice; }
     public List<Transaction> getTransactions() { return transactions; }
     public Transaction getLastTransactin() { return transactions.get(transactions.size() - 1); }
     public List<SellOffer> getSellOrders() { return new ArrayList<>(sellOrders); }
@@ -55,7 +48,7 @@ public class OrdersBook {
         return new ArrayList<>(sellers.get(a));
     }
 
-    public boolean limitBuyOrder(Agent originator, int stockQuantity, int price)
+    public boolean limitBuyOrder(Agent originator, long  stockQuantity, long  price)
     {
         if (stockQuantity <= 0) {
             throw new RuntimeException("Tried to insert a buy offer with negative or zero stock quantity.");
@@ -73,7 +66,7 @@ public class OrdersBook {
         return true;
     }
 
-    public boolean limitSellOrder(Agent originator, int stockQuantity, int price)
+    public boolean limitSellOrder(Agent originator, long  stockQuantity, long  price)
     {
         if (stockQuantity <= 0) {
             throw new RuntimeException("Tried to insert a buy offer with negative or zero stock quantity.");
@@ -91,23 +84,23 @@ public class OrdersBook {
         return true;
     }
 
-    public boolean spotBuyOrder(Agent originator, int offeredCash)
+    public boolean spotBuyOrder(Agent originator, long  offeredCash)
     {
         if (offeredCash <= 0) {
             throw new RuntimeException("Tried to spot buy stocks for a negative or zero number of cash");
         }
         if (offeredCash < currentAskPrice) { return false; }
-        int availableCash = offeredCash;
+        long  availableCash = offeredCash;
         while (availableCash > currentAskPrice)
         {
             SellOffer bestO = sellOrders.peek();
             if (bestO == null) { break; }
-            int bestOStockQuantity = bestO.getStockQuantity();
+            long  bestOStockQuantity = bestO.getStockQuantity();
             if (bestOStockQuantity * bestO.price <= availableCash) {
                 if (bestO.accept(originator, bestOStockQuantity)) {
                     transactions.add(new Transaction(
-                        originator, bestO.owner,
-                        bestOStockQuantity * bestO.price, bestOStockQuantity, bestO.price));
+                            originator, bestO.owner,
+                            bestOStockQuantity * bestO.price, bestOStockQuantity, bestO.price));
                     availableCash -= bestOStockQuantity * bestO.price;
                     sellOrders.remove();
                     SellOffer nextSellOffer = sellOrders.peek();
@@ -117,37 +110,36 @@ public class OrdersBook {
                 else { throw new RuntimeException("Refused supposedly sane offer."); }
             }
             else {
-                int purchasableStocks = availableCash / bestO.price;
+                long  purchasableStocks = availableCash / bestO.price;
                 if(bestO.accept(originator, purchasableStocks))
                 {
                     transactions.add(new Transaction(
-                        originator, bestO.owner,
-                        purchasableStocks * bestO.price, purchasableStocks, bestO.price));
+                            originator, bestO.owner,
+                            purchasableStocks * bestO.price, purchasableStocks, bestO.price));
                     availableCash -= purchasableStocks * bestO.price;
                 }
                 else { throw new RuntimeException("Refused supposedly sane offer."); }
             }
         }
-        if (availableCash == offeredCash) { return false; }
-        return true;
+        return availableCash != offeredCash;
     }
 
-    public boolean spotSellOrder(Agent originator, int offeredStocks)
+    public boolean spotSellOrder(Agent originator, long  offeredStocks)
     {
         if (offeredStocks <= 0) {
             throw new RuntimeException("Tried to spot sell a negative or zero number of stocks.");
         }
-        int availableStocks = offeredStocks;
+        long  availableStocks = offeredStocks;
         while (availableStocks > 0)
         {
             BuyOffer bestO = buyOrders.peek();
             if (bestO == null) { break; }
-            int bestOStockQuantity = bestO.getStockQuantity();
+            long  bestOStockQuantity = bestO.getStockQuantity();
             if (bestOStockQuantity < availableStocks) {
                 if (bestO.accept(originator, bestOStockQuantity)) {
                     transactions.add(new Transaction(
-                        bestO.owner, originator,
-                        bestOStockQuantity * bestO.price, bestOStockQuantity, bestO.price));
+                            bestO.owner, originator,
+                            bestOStockQuantity * bestO.price, bestOStockQuantity, bestO.price));
                     availableStocks -= bestOStockQuantity;
                     buyOrders.remove();
                     BuyOffer nextBuyOffer = buyOrders.peek();
@@ -160,15 +152,14 @@ public class OrdersBook {
                 if(bestO.accept(originator, availableStocks))
                 {
                     transactions.add(new Transaction(
-                        bestO.owner, originator,
-                        availableStocks * bestO.price, availableStocks, bestO.price));
+                            bestO.owner, originator,
+                            availableStocks * bestO.price, availableStocks, bestO.price));
                     availableStocks = 0;
                 }
                 else { throw new RuntimeException("Refused supposedly sane offer."); }
             }
         }
-        if (availableStocks == offeredStocks) { return false; }
-        return true;
+        return availableStocks != offeredStocks;
     }
 
     public void removeAllOffers(Agent owner)

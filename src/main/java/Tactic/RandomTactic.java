@@ -36,22 +36,22 @@ public class RandomTactic extends Tactic
         double rand = r.nextDouble();
         double cumChance = 0.0;
         Action choosedAction =
-            rand < (cumChance += actionChances.limitBuy) ? (generateRandomLimitBuyAction(kn)) :
-                (rand < (cumChance += actionChances.limitSell) ? (generateRandomLimitSellAction(kn)) :
-                    (rand < (cumChance += actionChances.spotBuy) ? (generateRandomSpotBuyAction(kn)) :
-                        (rand < (cumChance += actionChances.spotSell) ? (generateRandomSpotSellAction(kn)) :
-                            (rand < (cumChance += actionChances.removeBuyOrders) ? (generateRandomRemoveBuyOrdersAction(kn)) :
-                                (rand < (cumChance += actionChances.removeSellOrders) ? (generateRandomRemoveSellOrdersAction(kn))
-                                    : (new NullAction(kn.self)))))));
+                rand < (cumChance += actionChances.limitBuy) ? (generateRandomLimitBuyAction(kn)) :
+                        (rand < (cumChance += actionChances.limitSell) ? (generateRandomLimitSellAction(kn)) :
+                                (rand < (cumChance += actionChances.spotBuy) ? (generateRandomSpotBuyAction(kn)) :
+                                        (rand < (cumChance += actionChances.spotSell) ? (generateRandomSpotSellAction(kn)) :
+                                                (rand < (cumChance += actionChances.removeBuyOrders) ? (generateRandomRemoveBuyOrdersAction(kn)) :
+                                                        (rand < (cumChance += actionChances.removeSellOrders) ? (generateRandomRemoveSellOrdersAction(kn))
+                                                                : (new NullAction(kn.self)))))));
         plannedActionsToUpdate.clear();
         plannedActionsToUpdate.add(choosedAction);
     }
 
-    private int generateRandomBuyPrice(int ask, int bid)
+    private long generateRandomBuyPrice(long ask, long bid)
     {
         double alpha = alphaFractionCoeff * (rCoeff + 1) / Math.pow(bid, rCoeff+1);
         double beta = (mCoeff + 1) / Math.pow((double)(bid - ask != 0 ? bid - ask : 1), mCoeff + 1)
-                    * (alpha * Math.pow((double)bid, rCoeff+1)/(rCoeff+1) - 1);
+                * (alpha * Math.pow((double)bid, rCoeff+1)/(rCoeff+1) - 1);
         double x = 1 - r.nextDouble();
         if (0 < x && x <= alpha * Math.pow((double)bid, rCoeff + 1) / (rCoeff + 1))
         {
@@ -64,47 +64,56 @@ public class RandomTactic extends Tactic
 
     }
 
-    private int generateRandomSellPrice(int ask, int bid)
+    private long generateRandomSellPrice(long ask, long bid)
     {
         double alpha = alphaFractionCoeff * (rCoeff + 1) / Math.pow(bid, rCoeff+1);
         double beta = (mCoeff + 1) / Math.pow((double)(bid - ask != 0 ? bid - ask : 1), mCoeff + 1)
-                    * (alpha * Math.pow((double)bid, rCoeff+1)/(rCoeff+1) - 1);
+                * (alpha * Math.pow((double)bid, rCoeff+1)/(rCoeff+1) - 1);
         double x = 1 - r.nextDouble();
         if (0 < x && x <= -beta / (mCoeff+1) * Math.pow((double)(bid - ask), mCoeff+1))
         {
-            return bid + (int) (Math.pow(-1.0, mCoeff + 1) * Math.pow(-(mCoeff + 1) / beta * x, 1 / (mCoeff + 1)));
+            long result =  bid + (int) (Math.pow(-1.0, mCoeff + 1) * Math.pow(-(mCoeff + 1) / beta * x, 1 / (mCoeff + 1)));
+
+            if(result<=0) {
+                generateRandomSellPrice(ask, bid);
+            }
+            return result;
         }
         else
         {
-            return (int)((double)(ask * bid) / Math.pow((rCoeff+1) / alpha * (1-x), 1/(rCoeff+1)));
+            long result =  (int)((((double)ask) * ((double)bid)) / Math.pow((rCoeff+1) / alpha * (1-x), 1/(rCoeff+1)));
+            if(result<=0) {
+                generateRandomSellPrice(ask, bid);
+            }
+            return result;
         }
     }
 
     private Action generateRandomLimitBuyAction(InstantaneousKnowledge knowledge) {
-        int price = generateRandomBuyPrice(knowledge.askPrice, knowledge.bidPrice);
+        long price = generateRandomBuyPrice(knowledge.askPrice, knowledge.bidPrice);
         if (price > knowledge.freeAssets.cash) { return new NullAction(knowledge.self); }
 
-        int stocks = r.nextInt(knowledge.freeAssets.cash / price) + 1;
+        long stocks = nextLong(knowledge.freeAssets.cash / price) + 1;
 
         return new LimitBuyAction(knowledge.self, stocks, price);
     }
 
     private Action generateRandomLimitSellAction(InstantaneousKnowledge knowledge) {
-        int price = generateRandomSellPrice(knowledge.askPrice, knowledge.bidPrice);
+        long price = generateRandomSellPrice(knowledge.askPrice, knowledge.bidPrice);
         if (knowledge.freeAssets.stocks < 1) { return new NullAction(knowledge.self); }
-        int stocks = r.nextInt(knowledge.freeAssets.stocks) + 1;
+        long stocks = nextLong(knowledge.freeAssets.stocks) + 1;
         return new LimitSellAction(knowledge.self, stocks, price);
     }
 
     private Action generateRandomSpotBuyAction(InstantaneousKnowledge knowledge) {
         if (knowledge.askPrice > knowledge.freeAssets.cash) { return new NullAction(knowledge.self); }
-        int cash = r.nextInt(knowledge.freeAssets.cash - knowledge.askPrice + 1) + knowledge.askPrice;
+        long cash = nextLong(knowledge.freeAssets.cash - knowledge.askPrice + 1) + knowledge.askPrice;
         return new SpotBuyAction(knowledge.self, cash);
     }
 
     private Action generateRandomSpotSellAction(InstantaneousKnowledge knowledge) {
         if (knowledge.freeAssets.stocks < 1) { return new NullAction(knowledge.self); }
-        int stocks = r.nextInt(knowledge.freeAssets.stocks) + 1;
+        long stocks = nextLong(knowledge.freeAssets.stocks) + 1;
         return new SpotSellAction(knowledge.self, stocks);
     }
 
@@ -121,7 +130,10 @@ public class RandomTactic extends Tactic
         if (toRemove.size() < 1) { return new NullAction(knowledge.self); }
         return new CancelLimitSellOrdersAction(knowledge.self, toRemove);
     }
-
+    private long nextLong(long upperLimit)
+    {
+        return (long)(r.nextDouble()*(double)(upperLimit));
+    }
     public static class ActionChances
     {
         public final double removeBuyOrders;
@@ -133,8 +145,8 @@ public class RandomTactic extends Tactic
         public final double idle;
 
         public ActionChances(
-            double removeBuyOrders, double removeSellOrders, double spotBuy, double spotSell,
-            double limitBuy, double limitSell, double idle) {
+                double removeBuyOrders, double removeSellOrders, double spotBuy, double spotSell,
+                double limitBuy, double limitSell, double idle) {
             double sum = removeBuyOrders + removeSellOrders + spotBuy + spotSell + limitBuy + limitSell + idle;
             this.removeBuyOrders = removeBuyOrders/sum;
             this.removeSellOrders = removeSellOrders/sum;

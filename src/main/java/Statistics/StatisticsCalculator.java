@@ -34,14 +34,14 @@ public class StatisticsCalculator {
     More efficient to  calculate everything together
      */
     public void calculateEverything() throws Exception {
-            calculateSpreadStatistics();
-            calculateLogReturnsStatistics();
-            getLogReturnsTails();
+        calculateSpreadStatistics();
+        calculateLogReturnsStatistics();
+        getLogReturnsTails();
     }
     public void calculateSpreadStatistics() throws Exception {
         if(values.containsKey(spreadMeanName)&&values.containsKey(spreadStandardDeviationName)) return ;
 
-        List<Pair<Integer, Double>> logSpreadByTime =  simulation.getObservable(Observable.LOG_SPREAD);
+        List<Pair<Long, Double>> logSpreadByTime =  simulation.getObservable(Observable.LOG_SPREAD);
 
         HashMap<String, Double> results=StatisticsCalculator.computeStatistics(logSpreadByTime,WARMUP_ROUNDS_FOR_STATISTICS,spreadMeanName, spreadStandardDeviationName);
         values.putAll(results);
@@ -53,14 +53,14 @@ public class StatisticsCalculator {
     private void calculateLogReturnsStatistics() throws Exception {
         if(values.containsKey(logReturnsMeanName)&&values.containsKey(logReturnsStandardDeviationName)) return ;
 
-        List<Pair<Integer, Double>> logReturnsByTime =  simulation.getObservable(Observable.LOG_RETURNS);
+        List<Pair<Long, Double>> logReturnsByTime =  simulation.getObservable(Observable.LOG_RETURNS);
 
         HashMap<String, Double> results=StatisticsCalculator.computeStatistics(logReturnsByTime,WARMUP_ROUNDS_FOR_STATISTICS,logReturnsMeanName, logReturnsStandardDeviationName);
         values.putAll(results);
 
     }
 
-    public static HashMap<String,Double> computeStatistics(List<Pair<Integer,Double>> timeSerie, int warmupRounds,String meanName, String standardDeviationName) throws Exception {
+    public static HashMap<String,Double> computeStatistics(List<Pair<Long,Double>> timeSerie, int warmupRounds,String meanName, String standardDeviationName) throws Exception {
 
         double sum = 0;
         double quadraticSum = 0;
@@ -118,7 +118,7 @@ public class StatisticsCalculator {
     public double getLogReturnsTails() {
 
         if(values.containsKey(logTailName)) return values.get(logTailName);
-        List<Pair<Integer, Double>> logReturnsByTime =  simulation.getObservable(Observable.LOG_RETURNS);
+        List<Pair<Long, Double>> logReturnsByTime =  simulation.getObservable(Observable.LOG_RETURNS);
 
         logReturnsByTime = logReturnsByTime.subList(WARMUP_ROUNDS_FOR_STATISTICS, logReturnsByTime.size());
 
@@ -128,7 +128,7 @@ public class StatisticsCalculator {
 
         List<Double> tailSublist = logReturns.subList(0, 1001);
 
-        List<Double> logTail = tailSublist.stream().map(d ->d!=0? Math.log(d) : 0.0004).collect(Collectors.toList());
+        List<Double> logTail = tailSublist.stream().map(d ->d!=0? Math.log(d) : Math.log(0.0004)).collect(Collectors.toList());
 
         Double sum = 0.0;
         for(int i=0;i<logTail.size()-1; i++) {

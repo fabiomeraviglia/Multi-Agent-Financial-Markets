@@ -1,6 +1,10 @@
 package GeneticOptimization.Genes;
 
 import GeneticOptimization.OptimizationManager;
+
+import java.math.BigDecimal;
+import java.math.MathContext;
+
 public class FloatingPointGene extends Gene<Double> {
 
     private static final long serialVersionUID = 7519323639287519811L;
@@ -15,13 +19,16 @@ public class FloatingPointGene extends Gene<Double> {
     }
     public FloatingPointGene(String name, Double value, Double minValue, Double maxValue)
     {
-        super(name,value);
+        super(name,new BigDecimal(value).round(new MathContext(2)).doubleValue());
         if(minValue>maxValue) throw  new IllegalArgumentException();
-        if(minValue>value) throw  new IllegalArgumentException();
 
+        if(minValue>value) throw  new IllegalArgumentException();
         if(maxValue<value) throw  new IllegalArgumentException();
+
         this.minValue=minValue;
         this.maxValue=maxValue;
+
+
     }
     @Override
     public Gene<Double> getMutation(Double variationMagnitude)

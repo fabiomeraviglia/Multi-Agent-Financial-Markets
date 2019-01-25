@@ -5,9 +5,9 @@ import Simulation.Simulation;
 
 public class SpotBuyAction extends Action
 {
-    public final int offeredCash;
+    public final long offeredCash;
 
-    public SpotBuyAction(Agent performer, int offeredCash) {
+    public SpotBuyAction(Agent performer, long offeredCash) {
         super(performer);
         this.offeredCash = offeredCash;
     }

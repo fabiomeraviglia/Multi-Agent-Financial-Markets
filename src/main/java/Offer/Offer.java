@@ -2,16 +2,14 @@ package Offer;
 
 import Simulation.Agent;
 
-import java.util.Comparator;
-
 public abstract class Offer {
 
-    protected int stockQuantity;
+    protected long stockQuantity;
 
-    public final int price;
+    public final long price;
     public final Agent owner;
 
-    public Offer(Agent owner, int stockQuantity, int price)
+    public Offer(Agent owner, long stockQuantity, long price)
     {
         if (stockQuantity < 0 || price < 0) {
             throw new RuntimeException("Tried to create offer with negative price or stock quantity.");
@@ -21,17 +19,17 @@ public abstract class Offer {
         this.price = price;
     }
 
-    public abstract boolean accept(Agent client, int stockQuantity);
+    public abstract boolean accept(Agent client, long stockQuantity);
     public abstract void cancel();
 
-    public void modifyOfferedStocks(int quantity) {
+    public void modifyOfferedStocks(long quantity) {
         if (-quantity > this.stockQuantity) {
             throw new RuntimeException("Tried to remove more stocks than available in offer.");
         }
         this.stockQuantity += quantity;
     }
 
-    public int getStockQuantity() { return stockQuantity; }
+    public long getStockQuantity() { return stockQuantity; }
 
     @Override
     public String toString() {

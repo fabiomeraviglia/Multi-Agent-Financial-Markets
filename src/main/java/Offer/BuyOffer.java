@@ -6,15 +6,15 @@ import java.util.Comparator;
 
 public class BuyOffer extends Offer {
 
-    public BuyOffer(Agent owner, int stockQuantity, int price) {
+    public BuyOffer(Agent owner, long stockQuantity, long price) {
         super(owner, stockQuantity, price);
         owner.modifyOfferedCash(stockQuantity * price);
         owner.modifyFreeCash(- stockQuantity * price);
     }
 
     @Override
-    public boolean accept(Agent seller, int quantity) {
-        Integer totalStocksCost = quantity * price;
+    public boolean accept(Agent seller, long quantity) {
+        long totalStocksCost = quantity * price;
         if (quantity > stockQuantity) { return false; }
         if (totalStocksCost > owner.getOfferedAssets().cash) { return false; }
         if (quantity > seller.getFreeAssets().stocks) { return false; }
@@ -33,6 +33,12 @@ public class BuyOffer extends Offer {
     }
 
     public static class BidComparator implements Comparator<Offer> {
-        @Override public int compare(Offer x, Offer y) {return y.price - x.price; }
+        @Override public int compare(Offer x, Offer y)
+        {
+            if(y.price>  x.price)  return 1;
+            if(y.price ==  x.price) return 0;
+            return -1;
+
+        }
     }
 }
