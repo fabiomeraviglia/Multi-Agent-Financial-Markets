@@ -8,6 +8,9 @@ import Gui.PlotManager;
 import Simulation.Configuration;
 import Simulation.Simulation;
 import Statistics.StatisticsCalculator;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.util.Pair;
 public class Main
 {
 
@@ -17,7 +20,9 @@ public class Main
     int ROUNDS = Configuration.ROUNDS;
 
     System.out.println("Inizializzazione simulazione.");
-    Simulation sim = new Simulation(new Configuration());
+    Configuration config = new Configuration();
+    config.setConfiguration(Configuration.ConfigurationType.DANILODEFAULTS);
+    Simulation sim = new Simulation(config);
 
     System.out.println("Inizializzazione grafici");
     PlotManager pm = new PlotManager();
@@ -55,10 +60,22 @@ public class Main
 
         }
         catch(Exception ex) {System.out.println("\nError in calculating statistics");}
-
+            
       }
 
+      
     }
+ 
+    
+    List<Pair<Long,Double>> list = sim.getObservable(Observable.BID_PRICE_HISTORY);
+    String output = "";
+    for(int i =0; i< list.size();i++)
+        output = output + i + ":" + list.get(i).getValue().toString().replace(".",",") +"\r\n";
+    
+    GeneticOptimization.SerializationManager.saveToFile("DataOutput.txt", output) ;
+    
+    
+    
     sim.nextTurn(); // for debugging purpose: add a last round for easy breakpoint
     System.out.printf("\n");
 

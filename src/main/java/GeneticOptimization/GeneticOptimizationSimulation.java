@@ -24,7 +24,7 @@ public class GeneticOptimizationSimulation implements Serializable{
 
     private final int ELITE_SIZE = getEliteSize();
     private int generationNumber = 1;
-    private  double lastTurnRelativeError = 0.01;
+    private double lastTurnRelativeError = 0.01;
     
     
     
@@ -92,10 +92,10 @@ public class GeneticOptimizationSimulation implements Serializable{
     }
     private int timesToEvaluate() {
         //Se tra una valutazione e l'altra cambia molto il valore della fitness significa che serve fare la media tra molte valutazioni 
-        if(lastTurnRelativeError < 0.05) return 1;
-        if(lastTurnRelativeError < 0.10) return 2;
-        if(lastTurnRelativeError < 0.15) return 3;
-        if(lastTurnRelativeError < 0.20) return 4;
+        if(lastTurnRelativeError < 0.04) return 1;
+        if(lastTurnRelativeError < 0.08) return 2;
+        if(lastTurnRelativeError < 0.12) return 3;
+        if(lastTurnRelativeError < 0.16) return 4;
         return 5;
     }
     private void computeFitness(List<Chromosome> chromosomes) {
@@ -318,9 +318,9 @@ public class GeneticOptimizationSimulation implements Serializable{
 
         chromosomes= new Chromosome[POPULATION_SIZE];
 
-       // chromosomes[0]=ChromosomeFactory.getDefaultChromosome(); //primo elemento ha valori di default
+        chromosomes[0]=ChromosomeFactory.getDefaultChromosome(); //primo elemento ha valori di default
 
-        for(int i = 0; i< POPULATION_SIZE; i++)
+        for(int i = 1; i< POPULATION_SIZE; i++)
         {
             chromosomes[i]=ChromosomeFactory.getRandomChromosome();
         }

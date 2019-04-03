@@ -16,8 +16,9 @@ public class MainToAverage {
         double sumFitness = 0;
         for(int j=0;j<numberOfSimulations;j++) {
             int ROUNDS = 40000;
-            Simulation sim = new Simulation(new Configuration());
-
+           Configuration config = new Configuration();
+         config.setConfiguration(Configuration.ConfigurationType.VOW3);
+            Simulation sim = new Simulation(config);
 
             System.out.println("Inizio simulazione n :"+j);
             for (int i = 0; i < ROUNDS; i++) {

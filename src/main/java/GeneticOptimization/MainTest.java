@@ -14,7 +14,7 @@ public class MainTest {
 
         System.out.println("Starting geneticOptimization");
 
-      //  optimizationManager.loadPreviousRun("Configuration 20190121_193643.txt");
+       // optimizationManager.loadPreviousRun("Configuration 20190126_231021.txt");
         optimizationManager.runOptimization(GeneticExperimentHyperparameters.getRunTime());
     }
 }

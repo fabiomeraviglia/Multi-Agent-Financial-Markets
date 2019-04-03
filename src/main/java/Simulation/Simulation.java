@@ -180,7 +180,7 @@ public class Simulation {
 
     private void updateLogSpread(List<Pair<Long, Double>> s)
     {
-        Long lastTime = s.size() == 0 ? 0L : s.get(s.size() - 1).getKey();
+        Long lastTime = s.isEmpty() ? 0L : s.get(s.size() - 1).getKey();
         List<Pair<Long, Double>> askHistory = observables.get(Observable.ASK_PRICE_HISTORY);
         List<Pair<Long, Double>> bidHistory = observables.get(Observable.BID_PRICE_HISTORY);
         double lastAskPrice = askHistory.size() > 0

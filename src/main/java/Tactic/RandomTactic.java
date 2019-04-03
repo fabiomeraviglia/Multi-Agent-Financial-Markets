@@ -72,18 +72,19 @@ public class RandomTactic extends Tactic
         double x = 1 - r.nextDouble();
         if (0 < x && x <= -beta / (mCoeff+1) * Math.pow((double)(bid - ask), mCoeff+1))
         {
-            long result =  bid + (int) (Math.pow(-1.0, mCoeff + 1) * Math.pow(-(mCoeff + 1) / beta * x, 1 / (mCoeff + 1)));
-
+            long result =  bid + (long) (Math.pow(-1.0, mCoeff + 1) * Math.pow(-(mCoeff + 1) / beta * x, 1 / (mCoeff + 1)));
+                
             if(result<=0) {
-                generateRandomSellPrice(ask, bid);
+                return 1;
             }
             return result;
         }
         else
         {
-            long result =  (int)((((double)ask) * ((double)bid)) / Math.pow((rCoeff+1) / alpha * (1-x), 1/(rCoeff+1)));
+            long result =  (long)((((double)ask) * ((double)bid)) / Math.pow((rCoeff+1) / alpha * (1-x), 1/(rCoeff+1)));
+            
             if(result<=0) {
-                generateRandomSellPrice(ask, bid);
+                return 1;
             }
             return result;
         }
