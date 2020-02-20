@@ -53,5 +53,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
+    <name>financial-markets</name>
 </project>
